@@ -30,6 +30,9 @@ PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
 
+RenderItem *ball_render_item = NULL;
+PxTransform ball_transform;
+
 
 // Initialize physics engine
 void initPhysics(bool interactive)
@@ -45,6 +48,15 @@ void initPhysics(bool interactive)
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(),true,gPvd);
 
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+
+	// ball:
+	ball_transform = PxTransform(0.0f, 0.0f, 0.0f);
+
+	const Vector4 color = { 1.0, 0.0, 0.0, 1.0 };
+	ball_render_item = new RenderItem(CreateShape(PxSphereGeometry(10.0f)), &ball_transform, color);
+	RegisterRenderItem(ball_render_item);
+
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
@@ -73,6 +85,10 @@ void stepPhysics(bool interactive, double t)
 void cleanupPhysics(bool interactive)
 {
 	PX_UNUSED(interactive);
+
+	// ball:
+	DeregisterRenderItem(ball_render_item);
+
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
 	gScene->release();
