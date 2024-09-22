@@ -1,17 +1,32 @@
+#include <cmath>
 #include "v3_f32.hpp"
 
-float &v3_f32::x() {
-	return elements.at(0);
-}
+namespace types {
+	f32 v3_f32::magnitude_sqr() {
+		return v3_f32::dot(*this, *this);
+	}
 
-float &v3_f32::y() {
-	return elements.at(1);
-}
+	f32 v3_f32::magnitude() {
+		return std::sqrtf(magnitude_sqr());
+	}
 
-float &v3_f32::z() {
-	return elements.at(2);
-}
+	v3_f32 v3_f32::normalized() {
+		return *this / this->magnitude();
+	}
 
-float& v3_f32::operator[](size_t i) {
-	return elements.at(i);
+
+	v3_f32::v3_f32(f32 x, f32 y, f32 z)
+		: x(x), y(y), z(z) { }
+
+	v3_f32::v3_f32(v3_f32 const& v)
+		: x(v.x), y(v.y), z(v.z) { }
+
+	v3_f32::v3_f32(v3_f32 &&v)
+		: x(std::move(v.x)), y(std::move(v.y)), z(std::move(v.z)) { }
+
+	f32 v3_f32::dot(v3_f32 u, v3_f32 v) {
+		return u.x * v.x
+			+ u.y * v.y
+			+ u.z * v.z;
+	}
 }

@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#include "types/v3_f32.hpp"
+
 std::string display_text = "This is a test";
 
 
@@ -30,8 +32,18 @@ PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
 
-RenderItem *ball_render_item = NULL;
-PxTransform ball_transform;
+
+RenderItem *origin_render_item = NULL;
+PxTransform origin_transform;
+
+RenderItem* positive_x_render_item = NULL;
+PxTransform positive_x_transform;
+
+RenderItem* positive_y_render_item = NULL;
+PxTransform positive_y_transform;
+
+RenderItem* positive_z_render_item = NULL;
+PxTransform positive_z_transform;
 
 
 // Initialize physics engine
@@ -50,12 +62,29 @@ void initPhysics(bool interactive)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
 
-	// ball:
-	ball_transform = PxTransform(0.0f, 0.0f, 0.0f);
+	// axis:
+	using namespace types;
+	const f32 spacing = 16.0f;
+	origin_transform = PxTransform(v3_f32(0.0f, 0.0f, 0.0f));
+	positive_x_transform = PxTransform(v3_f32(spacing, 0.0f, 0.0f));
+	positive_y_transform = PxTransform(v3_f32(0.0f, spacing, 0.0f));
+	positive_z_transform = PxTransform(v3_f32(0.0f, 0.0f, spacing));
 
-	const Vector4 color = { 1.0, 0.0, 0.0, 1.0 };
-	ball_render_item = new RenderItem(CreateShape(PxSphereGeometry(10.0f)), &ball_transform, color);
-	RegisterRenderItem(ball_render_item);
+	const Vector4 color_origin = { v3_f32(1.0f, 1.0f, 1.0f), 1.0 };
+	const Vector4 color_x = { v3_f32(1.0f, 0.0f, 0.0f), 1.0 };
+	const Vector4 color_y = { v3_f32(0.0f, 1.0f, 0.0f), 1.0 };
+	const Vector4 color_z = { v3_f32(0.0f, 0.0f, 1.0f), 1.0 };
+
+	const f32 size = 2.0f;
+	origin_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &origin_transform, color_origin);
+	positive_x_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_x_transform, color_x);
+	positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
+	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
+
+	RegisterRenderItem(origin_render_item);
+	RegisterRenderItem(positive_x_render_item);
+	RegisterRenderItem(positive_y_render_item);
+	RegisterRenderItem(positive_z_render_item);
 
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
@@ -86,8 +115,11 @@ void cleanupPhysics(bool interactive)
 {
 	PX_UNUSED(interactive);
 
-	// ball:
-	DeregisterRenderItem(ball_render_item);
+	// axis:
+	DeregisterRenderItem(origin_render_item);
+	DeregisterRenderItem(positive_x_render_item);
+	DeregisterRenderItem(positive_y_render_item);
+	DeregisterRenderItem(positive_z_render_item);
 
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
