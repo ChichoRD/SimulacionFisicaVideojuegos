@@ -22,23 +22,34 @@ namespace types {
 	typedef size_t usize;
 	typedef ptrdiff_t isize;
 
-	struct v3_f32 {
+	union v3_f32 {
+	private:
+		std::array<f32, 3> _elements;
+
 	public:
-		f32 x, y, z;
+		struct {
+			f32 x, y, z;
+		};
+
 	public:
 		f32 magnitude_sqr();
 		f32 magnitude();
 
 		v3_f32 normalized();
+
 	public:
 		v3_f32(f32 x, f32 y, f32 z);
 		v3_f32(v3_f32 const &v);
 		v3_f32(v3_f32 &&v);
 
 		static f32 dot(v3_f32 u, v3_f32 v);
+
 	public:
-		constexpr f32& operator[](usize i) {
-			return *(&(this->x) + i);
+		inline f32& operator[](usize i) {
+			return _elements.at(i);
+		}
+		constexpr f32 const& operator[](usize i) const {
+			return _elements.at(i);
 		}
 
 		v3_f32& operator+=(v3_f32 const& v) noexcept {
