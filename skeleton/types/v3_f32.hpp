@@ -38,9 +38,10 @@ namespace types {
 		v3_f32 normalized();
 
 	public:
-		v3_f32(f32 x, f32 y, f32 z);
-		v3_f32(v3_f32 const &v);
-		v3_f32(v3_f32 &&v);
+		v3_f32() noexcept;
+		v3_f32(f32 x, f32 y, f32 z) noexcept;
+		v3_f32(v3_f32 const &v) noexcept;
+		v3_f32(v3_f32 &&v) noexcept;
 		~v3_f32();
 
 		static f32 dot(v3_f32 u, v3_f32 v);
@@ -55,9 +56,11 @@ namespace types {
 
 		v3_f32 &operator=(v3_f32 const &v) noexcept {
 			_elements = v._elements;
+			return *this;
 		}
 		v3_f32 &operator=(v3_f32 &&v) noexcept {
 			_elements = std::move(v._elements);
+			return *this;
 		}
 
 		v3_f32& operator+=(v3_f32 const& v) noexcept {
@@ -83,6 +86,10 @@ namespace types {
 			this->y /= s;
 			this->z /= s;
 			return *this;
+		}
+
+		v3_f32 operator-() noexcept {
+			return v3_f32(-x, -y, -z);
 		}
 
 		friend v3_f32 operator+(v3_f32 u, v3_f32 const& v) noexcept {

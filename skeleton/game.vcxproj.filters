@@ -11,6 +11,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="callbacks.cpp" />
     <ClCompile Include="types\v3_f32.cpp" />
+    <ClCompile Include="objects\particle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.hpp" />
@@ -23,6 +24,7 @@
     <ClInclude Include="RenderUtils.hpp" />
     <ClInclude Include="callbacks.hpp" />
     <ClInclude Include="types\v3_f32.hpp" />
+    <ClInclude Include="objects\particle.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Render">
