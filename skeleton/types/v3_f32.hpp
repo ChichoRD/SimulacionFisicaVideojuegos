@@ -41,6 +41,7 @@ namespace types {
 		v3_f32(f32 x, f32 y, f32 z);
 		v3_f32(v3_f32 const &v);
 		v3_f32(v3_f32 &&v);
+		~v3_f32();
 
 		static f32 dot(v3_f32 u, v3_f32 v);
 
@@ -50,6 +51,13 @@ namespace types {
 		}
 		constexpr f32 const& operator[](usize i) const {
 			return _elements.at(i);
+		}
+
+		v3_f32 &operator=(v3_f32 const &v) noexcept {
+			_elements = v._elements;
+		}
+		v3_f32 &operator=(v3_f32 &&v) noexcept {
+			_elements = std::move(v._elements);
 		}
 
 		v3_f32& operator+=(v3_f32 const& v) noexcept {
@@ -81,18 +89,30 @@ namespace types {
 			u += v;
 			return u;
 		}
+
 		friend v3_f32 operator-(v3_f32 u, v3_f32 const& v) noexcept {
 			u -= v;
 			return u;
 		}
+
 		friend v3_f32 operator*(v3_f32 u, f32 const& s) noexcept {
 			u *= s;
 			return u;
 		}
+		friend v3_f32 operator*(f32 s, v3_f32 &u) noexcept {
+			u *= s;
+			return u;
+		}
+
 		friend v3_f32 operator/(v3_f32 u, f32 const& s) noexcept {
 			u /= s;
 			return u;
 		}
+		friend v3_f32 operator/(f32 s, v3_f32 &u) noexcept {
+			u /= s;
+			return u;
+		}
+
 
 		operator physx::PxVec3() {
 			return physx::PxVec3(x, y, z);

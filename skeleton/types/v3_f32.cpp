@@ -24,6 +24,8 @@ namespace types {
 	v3_f32::v3_f32(v3_f32 &&v)
 		: x(std::move(v.x)), y(std::move(v.y)), z(std::move(v.z)) { }
 
+	v3_f32::~v3_f32() = default;
+
 	f32 v3_f32::dot(v3_f32 u, v3_f32 v) {
 		return u.x * v.x
 			+ u.y * v.y
