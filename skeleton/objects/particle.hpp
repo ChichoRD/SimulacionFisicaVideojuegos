@@ -13,20 +13,15 @@ namespace objects {
 
 	struct particle {
 	public:
+		position3_f32 previous_position;
 		position3_f32 position;
 		velocity3_f32 velocity;
 
 	public:
 		particle() noexcept;
-		particle(v3_f32 position, v3_f32 velocity) noexcept;
+		particle(position3_f32 position, velocity3_f32 velocity) noexcept;
 		particle(particle const &other) noexcept;
-		particle(particle&& other) noexcept;
 		~particle();
-
-	public:
-		position3_f32 step(seconds_f64 delta_time) noexcept;
-		velocity3_f32 add_acceleration(acceleration3_f32 acceleration, seconds_f64 delta_time) noexcept;
-		velocity3_f32 damp(f32 damping_factor, seconds_f64 delta_time) noexcept;
 
 	public:
 		position3_f32 integrate_semi_implicit_euler(
@@ -34,7 +29,17 @@ namespace objects {
 			f32 damping_factor,
 			seconds_f64 delta_time
 		) noexcept;
-		position3_f32 integrate_velocity_verlet(
+		position3_f32 integrate_euler(
+			acceleration3_f32 acceleration,
+			f32 damping_factor,
+			seconds_f64 delta_time
+		) noexcept;
+		position3_f32 integrate_midpoint(
+			acceleration3_f32 acceleration,
+			f32 damping_factor,
+			seconds_f64 delta_time
+		) noexcept;
+		position3_f32 integrate_verlet(
 			acceleration3_f32 acceleration,
 			f32 damping_factor,
 			seconds_f64 delta_time
@@ -44,12 +49,6 @@ namespace objects {
 		particle &operator=(particle const& other) noexcept {
 			this->position = other.position;
 			this->velocity = other.velocity;
-			return *this;
-		}
-
-		particle& operator=(particle&& other) noexcept {
-			this->position = std::move(other.position);
-			this->velocity = std::move(other.velocity);
 			return *this;
 		}
 
