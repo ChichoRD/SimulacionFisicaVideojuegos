@@ -221,10 +221,11 @@ void stepPhysics(bool interactive, double t)
 
 	objects::acceleration3_f32 g = { 0, -9.8f, 0 };
 	for (size_t i = 0; i < projectiles.size(); ++i) {
-		projectiles[i].integrate(g, objects::acceleration3_f32(), 0.9875f, t);
 
-		if (projectiles[i].particle.particle.position.y > 0)
+		if (projectiles[i].particle.particle.position.y > 0) {
+			projectiles[i].integrate(g, objects::acceleration3_f32(), 0.9875f, t);
 			projectiles[i].particle.particle >> projectile_transforms[i];
+		}
 	}
 
 	gScene->simulate(t);

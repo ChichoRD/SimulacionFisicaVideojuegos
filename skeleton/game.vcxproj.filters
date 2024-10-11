@@ -14,6 +14,7 @@
     <ClCompile Include="objects\particle.cpp" />
     <ClCompile Include="objects\mass_particle.cpp" />
     <ClCompile Include="objects\projectile.cpp" />
+    <ClCompile Include="systems\particle_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.hpp" />
@@ -30,6 +31,7 @@
     <ClInclude Include="objects\mass_particle.hpp" />
     <ClInclude Include="objects\projectile.hpp" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="systems\particle_system.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Render">
