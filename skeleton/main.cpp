@@ -108,26 +108,27 @@ static proyectile_count register_projectile(objects::projectile projectile, type
 }
 
 static void projectile_appearance(projectile_type type, types::v3_f32& out_color, types::f32 &out_scale) {
+	constexpr types::f32 meters_to_world_factor = 10.0f;
 	switch (type)
 	{
 	case BULLET: {
 		out_color = { 0.35, 0.35, 0.1 };
-		out_scale = 4.0f;
+		out_scale = 0.07035f * meters_to_world_factor;
 		return;
 	}
 	case FIRE_BALL: {
 		out_color = { 0.95, 0.3, 0.1 };
-		out_scale = 16.0f;
+		out_scale = 0.235f * meters_to_world_factor;
 		return;
 	}
 	case GAMING_MOUSE: {
 		out_color = { 0.025, 0.075, 0.1 };
-		out_scale = 10.0f;
+		out_scale = 0.12f * meters_to_world_factor;
 		return;
 	}
 	case PINEAPPLE: {
 		out_color = { 0.8, 0.8, 0.1 };
-		out_scale = 16.0f;
+		out_scale = 0.27f * meters_to_world_factor;
 		return;
 	}
 	default: {
@@ -221,7 +222,9 @@ void stepPhysics(bool interactive, double t)
 	objects::acceleration3_f32 g = { 0, -9.8f, 0 };
 	for (size_t i = 0; i < projectiles.size(); ++i) {
 		projectiles[i].integrate(g, objects::acceleration3_f32(), 0.9875f, t);
-		projectiles[i].particle.particle >> projectile_transforms[i];
+
+		if (projectiles[i].particle.particle.position.y > 0)
+			projectiles[i].particle.particle >> projectile_transforms[i];
 	}
 
 	gScene->simulate(t);
