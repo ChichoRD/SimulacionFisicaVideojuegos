@@ -12,6 +12,8 @@
     <ClCompile Include="callbacks.cpp" />
     <ClCompile Include="types\v3_f32.cpp" />
     <ClCompile Include="objects\particle.cpp" />
+    <ClCompile Include="objects\mass_particle.cpp" />
+    <ClCompile Include="objects\projectile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.hpp" />
@@ -25,6 +27,9 @@
     <ClInclude Include="callbacks.hpp" />
     <ClInclude Include="types\v3_f32.hpp" />
     <ClInclude Include="objects\particle.hpp" />
+    <ClInclude Include="objects\mass_particle.hpp" />
+    <ClInclude Include="objects\projectile.hpp" />
+    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Render">

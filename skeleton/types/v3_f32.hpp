@@ -1,4 +1,5 @@
-#pragma once
+#ifndef V3_F32_HPP
+#define V3_F32_HPP
 
 #include <array>
 #include <cstdint>
@@ -32,14 +33,15 @@ namespace types {
 		};
 
 	public:
-		f32 magnitude_sqr();
-		f32 magnitude();
+		f32 magnitude_sqr() const;
+		f32 magnitude() const;
 
-		v3_f32 normalized();
+		v3_f32 normalized() const;
 
 	public:
 		v3_f32() noexcept;
 		v3_f32(f32 x, f32 y, f32 z) noexcept;
+		v3_f32(physx::PxVec3 v) noexcept;
 		v3_f32(v3_f32 const &v) noexcept;
 		~v3_f32();
 
@@ -122,3 +124,5 @@ namespace types {
 	};
 
 }
+
+#endif // !V3_F32_HPP

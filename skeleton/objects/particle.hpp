@@ -1,3 +1,6 @@
+#ifndef PARTICLE_HPP
+#define PARTICLE_HPP
+
 #include <PxPhysicsAPI.h>
 #include "../types/v3_f32.hpp"
 #include "../RenderUtils.hpp"
@@ -47,6 +50,7 @@ namespace objects {
 
 	public:
 		particle &operator=(particle const& other) noexcept {
+			this->previous_position = other.previous_position;
 			this->position = other.position;
 			this->velocity = other.velocity;
 			return *this;
@@ -58,3 +62,5 @@ namespace objects {
 		}
 	};
 }
+
+#endif // !PARTICLE_HPP

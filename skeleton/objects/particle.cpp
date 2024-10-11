@@ -29,7 +29,7 @@ namespace objects {
 		acceleration3_f32 acceleration,
 		f32 damping_factor,
 		seconds_f64 delta_time
-	) {
+	) noexcept {
 		previous_position = position;
 		position += velocity * delta_time;
 
@@ -42,7 +42,7 @@ namespace objects {
 		acceleration3_f32 acceleration,
 		f32 damping_factor,
 		seconds_f64 delta_time
-	) {
+	) noexcept {
 		velocity *= std::powf(damping_factor, delta_time * 0.5f);
 		velocity += acceleration * delta_time * 0.5f;
 

@@ -10,8 +10,12 @@
 
 #include <iostream>
 
+#include <cassert>
 #include "types/v3_f32.hpp"
 #include "objects/particle.hpp"
+#include "objects/mass_particle.hpp"
+#include "objects/projectile.hpp"
+#include "main.h"
 
 std::string display_text = "This is a test";
 
@@ -46,11 +50,112 @@ PxTransform positive_y_transform;
 RenderItem* positive_z_render_item = NULL;
 PxTransform positive_z_transform;
 
-RenderItem* particle_render_item = NULL;
-PxTransform particle_transform;
+std::vector<objects::projectile> projectiles;
+std::vector<PxTransform> projectile_transforms;
+std::vector<RenderItem *> projectile_render_items;
 
-objects::particle particle;
+enum projectile_type {
+	BULLET,
+	FIRE_BALL,
+	GAMING_MOUSE,
+	PINEAPPLE
+};
 
+static objects::projectile create_projectile(objects::position3_f32 position, types::v3_f32 direction, projectile_type type) {
+	constexpr types::f32 speed_scale_factor = 0.9f;
+	switch (type) {
+	case BULLET:
+		return objects::projectile(0.03f, position, direction * 260, speed_scale_factor);
+	case FIRE_BALL:
+		return objects::projectile(0.0013f, position, direction * 24.38, speed_scale_factor * 3.0f);
+	case GAMING_MOUSE:
+		return objects::projectile(0.1f, position, direction * 17.88, speed_scale_factor * 2.0f);
+	case PINEAPPLE:
+		return objects::projectile(1.36078f, position, direction * 17.88, speed_scale_factor * 2.0f);
+	default: {
+		assert(false && "unreachable: invalid projectile type");
+		std::exit(EXIT_FAILURE);
+		return objects::projectile();
+	}
+	}
+}
+
+static objects::projectile create_projectile_from_camera(Camera const& camera, projectile_type type) {
+	return create_projectile(
+		camera.getEye(),
+		-camera.getDir(),
+		type
+	);
+}
+static objects::projectile create_projectile_from_camera(PxTransform const& camera, projectile_type type) {
+	return create_projectile(
+		camera.p,
+		-camera.rotate(positive_z_transform.p).getNormalized(),
+		type
+	);
+}
+
+typedef size_t proyectile_count;
+static proyectile_count register_projectile(objects::projectile projectile, types::v3_f32 color, types::f32 scale) {
+	projectiles.push_back(projectile);
+	projectile_transforms.push_back(PxTransform(projectile.particle.particle.position));
+	projectile_render_items.push_back(
+		new RenderItem(CreateShape(PxSphereGeometry(scale)),
+		&projectile_transforms.back(),
+		Vector4(color, 1.0f))
+	);
+	return projectiles.size();
+}
+
+static void projectile_appearance(projectile_type type, types::v3_f32& out_color, types::f32 &out_scale) {
+	switch (type)
+	{
+	case BULLET: {
+		out_color = { 0.35, 0.35, 0.1 };
+		out_scale = 4.0f;
+		return;
+	}
+	case FIRE_BALL: {
+		out_color = { 0.95, 0.3, 0.1 };
+		out_scale = 16.0f;
+		return;
+	}
+	case GAMING_MOUSE: {
+		out_color = { 0.025, 0.075, 0.1 };
+		out_scale = 10.0f;
+		return;
+	}
+	case PINEAPPLE: {
+		out_color = { 0.8, 0.8, 0.1 };
+		out_scale = 16.0f;
+		return;
+	}
+	default: {
+		assert(false && "unreachable: invalid projectile type");
+		std::exit(EXIT_FAILURE);
+		return;
+	}
+	}
+}
+
+typedef size_t projectile_index;
+static projectile_index instantiate_projectile(Camera const& camera, projectile_type type) {
+	objects::projectile p = create_projectile_from_camera(camera, type);
+
+	types::v3_f32 color;
+	types::f32 size;
+	projectile_appearance(type, color, size);
+	return register_projectile(p, color, size) - 1;
+}
+
+static projectile_index instantiate_projectile(PxTransform const& camera, projectile_type type) {
+	objects::projectile p = create_projectile_from_camera(camera, type);
+
+	types::v3_f32 color;
+	types::f32 size;
+	projectile_appearance(type, color, size);
+	return register_projectile(p, color, size) - 1;
+}
 
 // Initialize physics engine
 void initPhysics(bool interactive)
@@ -76,9 +181,6 @@ void initPhysics(bool interactive)
 	positive_y_transform = PxTransform(v3_f32(0.0f, spacing, 0.0f));
 	positive_z_transform = PxTransform(v3_f32(0.0f, 0.0f, spacing));
 
-	particle = objects::particle(v3_f32(spacing, spacing, spacing), -v3_f32(spacing, spacing, spacing) * 0.20f);
-	particle_transform = PxTransform();
-
 	const Vector4 color_origin = { v3_f32(1.0f, 1.0f, 1.0f), 1.0 };
 	const Vector4 color_x = { v3_f32(1.0f, 0.0f, 0.0f), 1.0 };
 	const Vector4 color_y = { v3_f32(0.0f, 1.0f, 0.0f), 1.0 };
@@ -90,13 +192,11 @@ void initPhysics(bool interactive)
 	positive_x_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_x_transform, color_x);
 	positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
 	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
-	particle_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &particle_transform, color_particle);
 
 	RegisterRenderItem(origin_render_item);
 	RegisterRenderItem(positive_x_render_item);
 	RegisterRenderItem(positive_y_render_item);
 	RegisterRenderItem(positive_z_render_item);
-	RegisterRenderItem(particle_render_item);
 
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
@@ -107,7 +207,7 @@ void initPhysics(bool interactive)
 	sceneDesc.filterShader = contactReportFilterShader;
 	sceneDesc.simulationEventCallback = &gContactReportCallback;
 	gScene = gPhysics->createScene(sceneDesc);
-	}
+}
 
 
 // Function to configure what happens in each step of physics
@@ -118,14 +218,11 @@ void stepPhysics(bool interactive, double t)
 {
 	PX_UNUSED(interactive);
 
-	// particle:
-	objects::acceleration3_f32 a = objects::acceleration3_f32(0, -1, 0);
-	particle.integrate_semi_implicit_euler(a, 0.9875f, t);
-	particle >> particle_transform;
-	//std::cout << "dt: " << t / 1000.0 << std::endl;
-	std::cout << particle.position.x << ", " << particle.position.y << ", " << particle.position.z << std::endl;
-	std::cout << particle.velocity.x << ", " << particle.velocity.y << ", " << particle.velocity.z << std::endl;
-	std::cout << std::endl;
+	objects::acceleration3_f32 g = { 0, -9.8f, 0 };
+	for (size_t i = 0; i < projectiles.size(); ++i) {
+		projectiles[i].integrate(g, objects::acceleration3_f32(), 0.9875f, t);
+		projectiles[i].particle.particle >> projectile_transforms[i];
+	}
 
 	gScene->simulate(t);
 	gScene->fetchResults(true);
@@ -138,11 +235,15 @@ void cleanupPhysics(bool interactive)
 	PX_UNUSED(interactive);
 
 	// axis:
-	DeregisterRenderItem(particle_render_item);
 	DeregisterRenderItem(positive_z_render_item);
 	DeregisterRenderItem(positive_y_render_item);
 	DeregisterRenderItem(positive_x_render_item);
 	DeregisterRenderItem(origin_render_item);
+
+	for (RenderItem *r : projectile_render_items) {
+		DeregisterRenderItem(r);
+		delete r;
+	}
 
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
@@ -164,10 +265,24 @@ void keyPress(unsigned char key, const PxTransform& camera)
 
 	switch(toupper(key))
 	{
-	//case 'B': break;
-	//case ' ':	break;
-	case ' ':
+	case 'B':
 	{
+		instantiate_projectile(camera, projectile_type::BULLET);
+		break;
+	}
+	case 'F':
+	{
+		instantiate_projectile(camera, projectile_type::FIRE_BALL);
+		break;
+	}
+	case 'G':
+	{
+		instantiate_projectile(camera, projectile_type::GAMING_MOUSE);
+		break;
+	}
+	case 'P':
+	{
+		instantiate_projectile(camera, projectile_type::PINEAPPLE);
 		break;
 	}
 	default:

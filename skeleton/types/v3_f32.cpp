@@ -2,15 +2,15 @@
 #include "v3_f32.hpp"
 
 namespace types {
-	f32 v3_f32::magnitude_sqr() {
+	f32 v3_f32::magnitude_sqr() const {
 		return v3_f32::dot(*this, *this);
 	}
 
-	f32 v3_f32::magnitude() {
+	f32 v3_f32::magnitude() const {
 		return std::sqrtf(magnitude_sqr());
 	}
 
-	v3_f32 v3_f32::normalized() {
+	v3_f32 v3_f32::normalized() const {
 		return *this / this->magnitude();
 	}
 
@@ -20,6 +20,9 @@ namespace types {
 
 	v3_f32::v3_f32(f32 x, f32 y, f32 z) noexcept
 		: x(x), y(y), z(z) { }
+
+	v3_f32::v3_f32(physx::PxVec3 v) noexcept
+		: x(v.x), y(v.y), z(v.z) { }
 
 	v3_f32::v3_f32(v3_f32 const& v) noexcept
 		: x(v.x), y(v.y), z(v.z) { }

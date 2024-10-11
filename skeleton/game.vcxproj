@@ -255,7 +255,9 @@
   <ItemGroup>
     <ClCompile Include="callbacks.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="objects\mass_particle.cpp" />
     <ClCompile Include="objects\particle.cpp" />
+    <ClCompile Include="objects\projectile.cpp" />
     <ClCompile Include="RenderUtils.cpp" />
     <ClCompile Include="Render\Camera.cpp" />
     <ClCompile Include="Render\Render.cpp" />
@@ -264,7 +266,10 @@
   <ItemGroup>
     <ClInclude Include="callbacks.hpp" />
     <ClInclude Include="core.hpp" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="objects\mass_particle.hpp" />
     <ClInclude Include="objects\particle.hpp" />
+    <ClInclude Include="objects\projectile.hpp" />
     <ClInclude Include="RenderUtils.hpp" />
     <ClInclude Include="Render\Camera.h" />
     <ClInclude Include="Render\Render.h" />
