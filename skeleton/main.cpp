@@ -15,7 +15,7 @@
 #include "objects/particle.hpp"
 #include "objects/mass_particle.hpp"
 #include "objects/projectile.hpp"
-#include "main.h"
+#include "systems/particle_system.hpp"
 
 std::string display_text = "This is a test";
 
@@ -199,6 +199,18 @@ void initPhysics(bool interactive)
 	RegisterRenderItem(positive_y_render_item);
 	RegisterRenderItem(positive_z_render_item);
 
+	systems::particle_system s = systems::particle_system();
+	objects::acceleration3_f32 *stored =
+		s.set_particle_attribute<objects::acceleration3_f32>(2, objects::acceleration3_f32(0, 1, 3));
+	objects::acceleration3_f32 got = s.get_particle_attribute<objects::acceleration3_f32>(2);
+	objects::acceleration3_f32 removed;
+	//bool had = s.remove_particle_attribute<objects::acceleration3_f32>(2, removed);
+	bool has = s.particle_has_attribute<objects::acceleration3_f32>(2);
+
+	size_t count = s.iter<objects::acceleration3_f32, int>
+		([](objects::acceleration3_f32 const &acc, int &pos) {
+		std::cout << acc.z << std::endl;
+	});
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
