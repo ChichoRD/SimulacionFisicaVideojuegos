@@ -29,6 +29,18 @@ namespace systems {
 		particle_system(size_t particle_capacity, size_t attribute_capacity) noexcept;
 		//~particle_system();
 
+	public:
+		typedef size_t particle_count_t;
+		typedef size_t attribute_count_t;
+
+		inline attribute_count_t attribute_count() const noexcept {
+			return particle_data_mask.size();
+		}
+
+		inline particle_count_t particle_count() const {
+			return attribute_count() > 0 ? particle_data_mask.at(0).size() : 0;
+		}
+
 	private:
 		template <class Map, class Key>
 		static typename Map::mapped_type& get_or_insert(Map& m, Key const& key, typename Map::mapped_type const& value) {
@@ -36,7 +48,7 @@ namespace systems {
 		}
 
 		template <typename T>
-		static inline size_t particle_data_index(particle_id particle)  {
+		static constexpr size_t particle_data_index(particle_id particle)  {
 			return (sizeof(T) / sizeof(uint8_t)) * particle;
 		}
 
@@ -47,16 +59,41 @@ namespace systems {
 				particle_data.push_back(std::vector<uint8_t>());
 				particle_data_mask.push_back(std::vector<bool>());
 			}
-
-			std::cout << "getting attribute " << inserted << std::endl;
 			return inserted;
+		}
+
+		template <typename T>
+		bool get_or_emit_attribute(attribute_id& out_attribute) const {
+			auto it = attribute_map.find(typeid(T));
+			if (it != attribute_map.end()) {
+				out_attribute = it->second;
+				return true;
+			} else {
+				out_attribute = particle_data.size();
+				return false;
+			}
 		}
 
 	public:
 		template <typename T>
-		bool particle_has_attribute(particle_id particle) {
+		constexpr bool particle_has_attribute(particle_id particle) {
 			std::vector<bool> const mask = particle_data_mask.at(get_or_register_attribute<T>());
 			return particle < mask.size() && mask.at(particle);
+		}
+
+		template <typename T>
+		constexpr bool particle_has_attribute(particle_id particle) const {
+			attribute_id attribute = 0;
+			if (get_or_emit_attribute<T>(attribute)) {
+				std::vector<bool> const mask = particle_data_mask.at(attribute);
+				return particle < mask.size() && mask.at(particle);
+			} else if (attribute < particle_data_mask.size()) {
+				assert(false && "unreachable: attribute and data_mask mismatch");
+				std::exit(EXIT_FAILURE);
+				return false;
+			} else {
+				return false;
+			}
 		}
 
 		template <typename T>
@@ -66,11 +103,32 @@ namespace systems {
 		}
 
 		template <typename T>
+		constexpr T const& get_particle_attribute(particle_id particle) const {
+			attribute_id attribute = 0;
+			assert(
+				get_or_emit_attribute<T>(attribute)
+				&& particle_has_attribute<T>(particle)
+				&& "error: attempted to access non-existing attribute of particle"
+			);
+			return reinterpret_cast<T&>(particle_data.at(attribute).at(particle_data_index<T>(particle)));
+		}
+
+
+		template <typename T>
 		T* get_particle_attribute_ptr(particle_id particle) {
 			if (particle_has_attribute<T>(particle)) {
 				return &get_particle_attribute<T>(particle);
 			} else {
 				return static_cast<T*>(nullptr);
+			}
+		}
+
+		template <typename T>
+		constexpr T const* get_particle_attribute_const_ptr(particle_id particle) const {
+			if (particle_has_attribute<T>(particle)) {
+				return &get_particle_attribute<T>(particle);
+			} else {
+				return static_cast<T const*>(nullptr);
 			}
 		}
 
@@ -141,16 +199,10 @@ namespace systems {
 		}
 
 	public:
-		typedef size_t particle_count;
-
-		inline particle_count count() const {
-			return particle_data_mask.size() > 0 ? particle_data_mask.at(0).size() : 0;
-		}
-
 		template <typename ...Ts>	
-		particle_count iter(std::function<void(Ts& ...)> const &func) {
-			particle_count count = 0;
-			for (size_t i = 0; i < this->count(); ++i) {
+		particle_count_t iter(std::function<void(Ts& ...)> const &func) {
+			particle_count_t count = 0;
+			for (size_t i = 0; i < particle_count(); ++i) {
 				bool all = true;
 				std::tuple<Ts* ...> attributes = {
 					[&]() {
@@ -168,77 +220,5 @@ namespace systems {
 
 			return count;
 		}
-
-		//particle_count iter(std::function<void(int, float)> const& func) {
-		//	particle_count count = 0;
-		//	for (size_t i = 0; i < this->count(); ++i) {
-		//		std::tuple<int, float> attributes;
-		//		bool all = true;
-
-		//		size_t j = 0;
-		//		while (j < 2 && all)
-		//		{
-		//			if (all &= particle_has_attribute<int>(i)) {
-		//				std::get<int>(attributes) = get_particle_attribute<int>(i);
-		//			}
-		//			++j;
-		//		}
-
-		//		if (all) {
-		//			++count;
-		//			call(func, attributes);
-		//		}
-		//	}
-
-		//	return count;
-		//}
-
-		//template <typename ...Ts>
-		//particle_count iter(void (* func)(Ts ...)) {
-		//	std::function<void(Ts ...)> f = func;
-		//	return iter(f);
-		//}
-
-
-		//struct early_exit {};
-		//template<typename T>struct get {
-		//	T operator()(std::size_t)const {
-		//		throw early_exit();
-		//	}
-		//};
-		//template<>struct get<int&> {
-		//	int& operator()(std::size_t)const {
-		//		static int x = 1;
-		//		return x;
-		//	}
-		//};
-		//template<>struct get<const float&> {
-		//	const float& operator()(std::size_t)const {
-		//		static const float x = 2;
-		//		return x;
-		//	}
-		//};
-		//template<>struct get<std::size_t> {
-		//	std::size_t operator()(std::size_t x)const {
-		//		return x == 1 ? throw early_exit() : x + 1;
-		//	}
-		//};
-		//template<typename...Ts, std::size_t...Idxs>void call(std::function<void(Ts...)>const& func, std::tuple<Ts...>&& tup, std::index_sequence<Idxs...>) {
-		//	func(std::get<Idxs>(std::move(tup))...);
-		//}
-		//template<typename...Ts>std::size_t foo(std::function<void(Ts...)>const& func, std::size_t count) {
-		//	std::size_t result = 0;
-		//	for (std::size_t i = 0; i < count; ++i) {
-		//		try {
-		//			call(func, std::tuple<Ts...>(get<Ts>()(i)...), std::make_index_sequence<sizeof...(Ts)>());
-		//			++result;
-		//		}
-		//		catch (const early_exit&) {}
-		//	}
-		//	return result;
-		//}
-		//void test(int& x, const float& y, std::size_t z) {
-		//	std::cout << x << ' ' << y << ' ' << z << '\n';
-		//}
 	};
 }
