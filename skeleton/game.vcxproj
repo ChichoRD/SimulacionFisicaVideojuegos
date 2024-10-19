@@ -275,6 +275,7 @@
     <ClInclude Include="Render\Camera.h" />
     <ClInclude Include="Render\Render.h" />
     <ClInclude Include="systems\particle_system.hpp" />
+    <ClInclude Include="types\particle_defs.hpp" />
     <ClInclude Include="types\v3_f32.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

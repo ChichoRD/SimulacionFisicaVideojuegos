@@ -32,6 +32,7 @@
     <ClInclude Include="objects\projectile.hpp" />
     <ClInclude Include="main.h" />
     <ClInclude Include="systems\particle_system.hpp" />
+    <ClInclude Include="types\particle_defs.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Render">

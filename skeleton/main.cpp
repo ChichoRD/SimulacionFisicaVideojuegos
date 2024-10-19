@@ -204,6 +204,7 @@ void initPhysics(bool interactive)
 		s.set_particle_attribute<objects::acceleration3_f32>(2, objects::acceleration3_f32(0, 1, 3));
 	objects::acceleration3_f32 got = s.get_particle_attribute<objects::acceleration3_f32>(2);
 	objects::acceleration3_f32 removed;
+	std::cout << "watashi" << std::endl;
 	//bool had = s.remove_particle_attribute<objects::acceleration3_f32>(2, removed);
 	bool has = s.particle_has_attribute<objects::acceleration3_f32>(2);
 
@@ -211,6 +212,11 @@ void initPhysics(bool interactive)
 		([](objects::acceleration3_f32 const &acc, int &pos) {
 		std::cout << acc.z << std::endl;
 	});
+
+	objects::particle const p = { { 4, 2, 0 }, { 0, 6, 9 } };
+	auto att = s.set_particle_attributes_deconstruct(4, p);
+
+	objects::particle r = s.get_particle_attributes_construct<objects::particle>(4);
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());

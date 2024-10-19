@@ -8,6 +8,13 @@ namespace objects {
 	particle::particle(position3_f32 position, velocity3_f32 velocity) noexcept
 		: previous_position(position), position(position), velocity(velocity) { }
 
+	particle::particle(
+		v3<f32, struct previous_position> previous_position,
+		v3<f32, struct position> position,
+		v3<f32, struct velocity> velocity
+	) noexcept
+		: previous_position(previous_position), position(position), velocity(velocity) { }
+
 	particle::particle(particle const& other) noexcept
 		: previous_position(other.position), position(other.position), velocity(other.velocity) { }
 
@@ -69,5 +76,12 @@ namespace objects {
 		return position;
 	}
 
+	particle::particle_deconstruct particle::deconstruct() const {
+		return particle_deconstruct {
+			v3<f32, struct previous_position>(previous_position),
+			v3<f32, struct position>(position),
+			v3<f32, struct velocity>(velocity),
+		};
+	}
 }
 

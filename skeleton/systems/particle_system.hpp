@@ -12,9 +12,13 @@
 
 #include <iostream>
 
-#include "../objects/mass_particle.hpp"
-
 namespace systems {
+
+	//template <size_t Attribute_Size, std::type_index Attribute_Type>
+	//struct attribute_storage {
+
+	//};
+
 	struct particle_system {
 	public:
 		std::vector<std::vector<uint8_t>> particle_data;
@@ -54,11 +58,12 @@ namespace systems {
 
 		template <typename T>
 		attribute_id get_or_register_attribute() {
-			attribute_id inserted = get_or_insert(attribute_map, typeid(T), particle_data.size());
+			attribute_id const inserted = get_or_insert(attribute_map, typeid(T), particle_data.size());
 			if (inserted == particle_data.size()) {
 				particle_data.push_back(std::vector<uint8_t>());
 				particle_data_mask.push_back(std::vector<bool>());
 			}
+			std::cout << "type id: " << inserted << std::endl;
 			return inserted;
 		}
 
@@ -172,6 +177,54 @@ namespace systems {
 				particle_data_index<T>(particle)
 			));
 			return true;
+		}
+
+	private:
+		template <
+			typename T,
+			typename ...Attributes,
+			typename Tuple = T::particle_deconstruct
+		>
+		std::tuple<Attributes* ...> set_particle_attributes_deconstruct_impl(
+			particle_id particle,
+			T const &attributes,
+			std::tuple<Attributes ...>
+		) {
+			return { set_particle_attribute<Attributes>(
+				particle,
+				std::move(std::get<Attributes>(attributes.deconstruct()))
+			)... };
+		}
+
+		template <
+			typename T,
+			typename ...Attributes,
+			typename = typename std::enable_if_t<std::is_constructible_v<T, Attributes...>>
+		>
+		T get_particle_attributes_construct_impl(particle_id particle, std::tuple<Attributes ...>) {
+			return T(get_particle_attribute<Attributes>(particle)...);
+		}
+
+	public:
+		template <
+			typename T,
+			typename ...Attributes,
+			typename Tuple = T::particle_deconstruct
+		>
+		auto set_particle_attributes_deconstruct(particle_id particle, T const &attributes) noexcept {
+			return set_particle_attributes_deconstruct_impl<T>(
+				particle,
+				attributes, 
+				Tuple{}
+			);
+		}
+
+		template <
+			typename T,
+			typename Tuple = T::particle_deconstruct
+		>
+		T get_particle_attributes_construct(particle_id particle) {
+			return get_particle_attributes_construct_impl<T>(particle, Tuple{});
 		}
 
 	private:

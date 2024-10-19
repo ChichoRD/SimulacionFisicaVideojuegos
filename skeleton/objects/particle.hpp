@@ -3,6 +3,7 @@
 
 #include <PxPhysicsAPI.h>
 #include "../types/v3_f32.hpp"
+#include "../types/particle_defs.hpp"
 #include "../RenderUtils.hpp"
 
 namespace objects {
@@ -23,6 +24,11 @@ namespace objects {
 	public:
 		particle() noexcept;
 		particle(position3_f32 position, velocity3_f32 velocity) noexcept;
+		particle(
+			v3<f32, struct previous_position> previous_position,
+			v3<f32, struct position> position,
+			v3<f32, struct velocity> velocity
+		) noexcept;
 		particle(particle const &other) noexcept;
 		~particle();
 
@@ -60,6 +66,11 @@ namespace objects {
 			transform.p = this->position;
 			return *this;
 		}
+
+	public:
+		using particle_deconstruct = systems::particle_trait::particle_deconstruct
+			<v3<f32, struct previous_position>, v3<f32, struct position>, v3<f32, struct velocity>>;
+		particle_deconstruct deconstruct() const;
 	};
 }
 
