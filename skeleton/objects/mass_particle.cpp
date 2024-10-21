@@ -5,9 +5,16 @@
 namespace objects {
 	mass_particle::mass_particle() noexcept
 		: particle(), inverse_mass(1.0f) { }
-	mass_particle::mass_particle(objects::particle particle, mass_f32 mass) noexcept
-		: particle(particle), inverse_mass(1.0f / mass) { }
-	mass_particle::mass_particle(mass_particle const& other) noexcept
+    mass_particle::mass_particle(
+		v3<f32, struct previous_position> previous_position,
+		v3<f32, struct position> position,
+		v3<f32, struct velocity> velocity,
+		f32_tag<struct inverse_mass> inverse_mass
+	) noexcept
+		: particle(previous_position, position, velocity), inverse_mass(inverse_mass.value) { }
+    mass_particle::mass_particle(objects::particle particle, mass_f32 mass) noexcept
+        : particle(particle), inverse_mass(1.0f / mass) {}
+    mass_particle::mass_particle(mass_particle const& other) noexcept
 		: particle(other.particle), inverse_mass(other.inverse_mass) { }
 
 	void mass_particle::add_impulse(impulse3_f32 impulse) noexcept {
@@ -65,5 +72,12 @@ namespace objects {
 		out_gravity_scale_factor = (scaled_particle.particle.velocity.magnitude_sqr() / particle.particle.velocity.magnitude_sqr());
 
 		return scaled_particle;
+	}
+
+	mass_particle::particle_deconstruct mass_particle::deconstruct() const {
+		return std::tuple_cat(
+			particle.deconstruct(),
+			std::make_tuple(f32_tag<struct inverse_mass>{ inverse_mass })
+		);
 	}
 }

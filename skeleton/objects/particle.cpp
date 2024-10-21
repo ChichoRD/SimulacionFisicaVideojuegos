@@ -77,11 +77,11 @@ namespace objects {
 	}
 
 	particle::particle_deconstruct particle::deconstruct() const {
-		return particle_deconstruct {
+		return std::make_tuple(
 			v3<f32, struct previous_position>(previous_position),
 			v3<f32, struct position>(position),
-			v3<f32, struct velocity>(velocity),
-		};
+			v3<f32, struct velocity>(velocity)
+		);
 	}
 }
 

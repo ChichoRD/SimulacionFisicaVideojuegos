@@ -13,111 +13,119 @@
 #include <iostream>
 
 namespace systems {
+	typedef size_t particle_id;
+	typedef size_t attribute_id;
+	typedef size_t particle_count_t;
+	typedef size_t attribute_count_t;
 
-	//template <size_t Attribute_Size, std::type_index Attribute_Type>
-	//struct attribute_storage {
-
-	//};
-
-	struct particle_system {
+	struct attribute_storage {
 	public:
-		std::vector<std::vector<uint8_t>> particle_data;
-		std::vector<std::vector<bool>> particle_data_mask;
-
-		typedef size_t particle_id;
-		typedef size_t attribute_id;
-		std::unordered_map<std::type_index, attribute_id> attribute_map;
+		enum storage_type {
+			vector,
+			unit,
+			shared
+		};
 
 	public:
-		particle_system() noexcept;
-		particle_system(size_t particle_capacity, size_t attribute_capacity) noexcept;
-		//~particle_system();
+		std::type_info const &type_info;
+		size_t const type_size;
+
+		std::vector<bool> mask;
+		std::vector<uint8_t> data;
+		storage_type storage_variant;
 
 	public:
-		typedef size_t particle_count_t;
-		typedef size_t attribute_count_t;
+		attribute_storage()
+			: type_info(typeid(bool)), type_size(), mask(), data(), storage_variant(storage_type::unit) { }
 
-		inline attribute_count_t attribute_count() const noexcept {
-			return particle_data_mask.size();
+		attribute_storage(size_t particle_capacity, storage_type storage_type, std::type_info const &type_info, size_t type_size)
+			: type_info(type_info), type_size(type_size), mask(), data(), storage_variant(storage_type) {
+			switch (storage_type) {
+			case storage_type::vector: {
+				mask.reserve(particle_capacity);
+				data.reserve(particle_capacity * type_size);
+				break;
+			}
+
+			case storage_type::unit: {
+				assert(type_info == typeid(bool) && "error: invalid storage type for unit storage");
+				mask.reserve(particle_capacity);
+				data.~vector();
+			}
+
+			case storage_type::shared: {
+				mask.resize(1, false);
+				data.resize(type_size);
+				break;
+			}
+
+			default: {
+				assert(false && "unreachable: invalid storage type");
+				std::exit(EXIT_FAILURE);
+				break;
+			}
+			}
 		}
 
+		template <typename T>
+		static attribute_storage create_vector_storage(size_t particle_capacity) {
+			return attribute_storage(particle_capacity, storage_type::vector, typeid(T), sizeof(T));
+		}
+
+		static attribute_storage create_unit_storage(size_t particle_capacity) {
+			return attribute_storage(particle_capacity, storage_type::unit, typeid(bool), sizeof(bool));
+		}
+
+		template <typename T>
+		static attribute_storage create_shared_storage(size_t particle_capacity) {
+			return attribute_storage(particle_capacity, storage_type::shared, typeid(T), sizeof(T));
+		}
+
+	public:
 		inline particle_count_t particle_count() const {
-			return attribute_count() > 0 ? particle_data_mask.at(0).size() : 0;
-		}
-
-	private:
-		template <class Map, class Key>
-		static typename Map::mapped_type& get_or_insert(Map& m, Key const& key, typename Map::mapped_type const& value) {
-			return m.insert(typename Map::value_type(key, value)).first->second;
+			return mask.size();
 		}
 
 		template <typename T>
 		static constexpr size_t particle_data_index(particle_id particle)  {
 			return (sizeof(T) / sizeof(uint8_t)) * particle;
 		}
-
-		template <typename T>
-		attribute_id get_or_register_attribute() {
-			attribute_id const inserted = get_or_insert(attribute_map, typeid(T), particle_data.size());
-			if (inserted == particle_data.size()) {
-				particle_data.push_back(std::vector<uint8_t>());
-				particle_data_mask.push_back(std::vector<bool>());
-			}
-			std::cout << "type id: " << inserted << std::endl;
-			return inserted;
-		}
-
-		template <typename T>
-		bool get_or_emit_attribute(attribute_id& out_attribute) const {
-			auto it = attribute_map.find(typeid(T));
-			if (it != attribute_map.end()) {
-				out_attribute = it->second;
-				return true;
-			} else {
-				out_attribute = particle_data.size();
-				return false;
-			}
-		}
-
+	
 	public:
 		template <typename T>
-		constexpr bool particle_has_attribute(particle_id particle) {
-			std::vector<bool> const mask = particle_data_mask.at(get_or_register_attribute<T>());
+		constexpr bool particle_has_attribute(particle_id particle) const {
 			return particle < mask.size() && mask.at(particle);
 		}
 
 		template <typename T>
-		constexpr bool particle_has_attribute(particle_id particle) const {
-			attribute_id attribute = 0;
-			if (get_or_emit_attribute<T>(attribute)) {
-				std::vector<bool> const mask = particle_data_mask.at(attribute);
-				return particle < mask.size() && mask.at(particle);
-			} else if (attribute < particle_data_mask.size()) {
-				assert(false && "unreachable: attribute and data_mask mismatch");
+		T& get_particle_attribute(particle_id particle) {
+			assert(typeid(T) == type_info && "error: attempted to access attribute of wrong type");
+			assert(particle_has_attribute<T>(particle) && "error: attempted to access non-existing attribute of particle");
+
+			switch (storage_variant) {
+			case vector:
+				return reinterpret_cast<T&>(data.at(particle_data_index<T>(particle)));
+			case unit: {
+				return reinterpret_cast<T&>(mask.at(particle));
+			}
+			case shared: {
+				if (data.size() != type_size) {
+					assert(false && "unreachable: data size mismatch, given shared storage");
+					std::exit(EXIT_FAILURE);
+				}
+				return reinterpret_cast<T&>(data.at(0));
+			}
+			default: {
+				assert(false && "unreachable: invalid storage type");
 				std::exit(EXIT_FAILURE);
-				return false;
-			} else {
-				return false;
+			}
 			}
 		}
 
 		template <typename T>
-		T& get_particle_attribute(particle_id particle) {
-			assert(particle_has_attribute<T>(particle) && "error: attempted to access non-existing attribute of particle");
-			return reinterpret_cast<T&>(particle_data.at(get_or_register_attribute<T>()).at(particle_data_index<T>(particle)));
-		}
-
-		template <typename T>
 		constexpr T const& get_particle_attribute(particle_id particle) const {
-			attribute_id attribute = 0;
-			assert(
-				get_or_emit_attribute<T>(attribute)
-				&& particle_has_attribute<T>(particle)
-				&& "error: attempted to access non-existing attribute of particle"
-			);
-			return reinterpret_cast<T&>(particle_data.at(attribute).at(particle_data_index<T>(particle)));
+			return get_particle_attribute<T>(particle);
 		}
-
 
 		template <typename T>
 		T* get_particle_attribute_ptr(particle_id particle) {
@@ -139,44 +147,191 @@ namespace systems {
 
 		template <typename T>
 		T *set_particle_attribute(particle_id particle, T&& attribute) {
-			attribute_id attribute_id = get_or_register_attribute<T>();
-			std::vector<bool> &mask = particle_data_mask.at(attribute_id);
-			std::vector<uint8_t> &data = particle_data.at(attribute_id);
+			assert(typeid(T) == type_info && "error: attempted to access attribute of wrong type");
 
-			size_t const data_index = particle_data_index<T>(particle);
-			size_t const data_size = data.size();
+			switch (storage_variant) {
+			case vector: {
+				size_t const data_index = particle_data_index<T>(particle);
+				size_t const data_size = data.size();
 
-			bool particle_in_mask = particle < mask.size();
-			bool particle_in_data = data_index + sizeof(T) <= data_size;
-			if (particle_in_mask != particle_in_data) {
-				assert(false && "unreachable: attribute data and mask mismatch");
+				bool particle_in_mask = particle < mask.size();
+				bool particle_in_data = data_index + sizeof(T) <= data_size;
+				if (particle_in_mask != particle_in_data) {
+					assert(false && "unreachable: attribute data and mask mismatch");
+					std::exit(EXIT_FAILURE);
+				}
+
+				if (!particle_in_mask) {
+					mask.resize(particle - mask.size() + 1);
+				}
+				mask.at(particle) = true;
+
+				if (!particle_in_data) {
+					size_t const missing_bytes = data_index + sizeof(T) - data_size;
+					data.resize(data_size + missing_bytes);
+				}
+
+				return static_cast<T *>(std::memcpy(&data.at(data_index), &attribute, sizeof(T)));
+			}
+			case unit: {
+				mask.at(particle) = true;
+				return reinterpret_cast<T *>(&mask.at(particle));
+			}
+			case shared: {
+				if (mask.size() != 1 || data.size() != type_size) {
+					assert(false && "unreachable: mask size mismatch, given shared storage");
+					std::exit(EXIT_FAILURE);	
+					return nullptr;
+				}
+				mask.at(0) = true;
+				reinterpret_cast<T&>(data.at(0)) = attribute;
+
+				return reinterpret_cast<T*>(&data.at(0));
+			}
+			default: {
+				assert(false && "unreachable: invalid storage type");
 				std::exit(EXIT_FAILURE);
+				return nullptr;
 			}
-
-			if (!particle_in_mask) {
-				mask.resize(particle - mask.size() + 1);
 			}
-			mask.at(particle) = true;
-
-			if (!particle_in_data) {
-				size_t const missing_bytes = data_index + sizeof(T) - data_size;
-				data.resize(data_size + missing_bytes);
-			}
-
-			return static_cast<T *>(std::memcpy(&data.at(data_index), &attribute, sizeof(T)));
 		}
 
 		template <typename T>
 		bool remove_particle_attribute(particle_id particle, T &out_particle_attribute) {
-			attribute_id const attribute_id = get_or_register_attribute<T>();
-			if (!particle_has_attribute<T>(particle))
-				return false;
+			assert(typeid(T) == type_info && "error: attempted to access attribute of wrong type");
 
-			particle_data_mask.at(attribute_id).at(particle) = false;
-			out_particle_attribute = reinterpret_cast<T&>(particle_data.at(attribute_id).at(
-				particle_data_index<T>(particle)
-			));
-			return true;
+			if (!particle_has_attribute<T>(particle)) {
+				return false;
+			}
+
+			switch (storage_variant) {
+			case vector: {
+				out_particle_attribute = get_particle_attribute<T>(particle);
+				mask.at(particle) = false;
+				return true;
+			}
+			case unit: {
+				mask.at(particle) = false;
+				return true;
+			}
+			case shared: {
+				if (mask.size() != 1 || data.size() != type_size) {
+					assert(false && "unreachable: mask size mismatch, given shared storage");
+					std::exit(EXIT_FAILURE);	
+					return nullptr;
+				}
+
+				mask.at(0) = false;
+				out_particle_attribute = get_particle_attribute<T>(particle);
+				return true;
+			}
+			}
+		}
+	};
+
+	struct particle_system {
+	public:
+		std::vector<attribute_storage> particles;
+		std::unordered_map<std::type_index, attribute_id> attribute_map;
+
+	public:
+		particle_system() noexcept;
+		particle_system(size_t attribute_capacity) noexcept;
+
+	public:
+		inline attribute_count_t attribute_count() const noexcept {
+			return particles.size();
+		}
+
+		inline particle_count_t particle_count() const {
+			return attribute_count() > 0 ? particles.at(0).particle_count() : 0;
+		}
+
+	private:
+		// template <class Map, class Key>
+		// static typename Map::mapped_type& get_or_insert(Map& m, Key const& key, typename Map::mapped_type const& value) {
+		// 	return m.insert(typename Map::value_type(key, value)).first->second;
+		// }
+
+		template <typename T>
+		bool get_or_emit_attribute(attribute_id& out_attribute) const {
+			auto it = attribute_map.find(typeid(T));
+			if (it != attribute_map.end()) {
+				out_attribute = it->second;
+				return true;
+			} else {
+				out_attribute = attribute_count();
+				return false;
+			}
+		}
+	
+	public:
+		template <typename T>
+		bool particle_has_attribute(particle_id particle) const {
+			attribute_id attribute = 0;
+			if (!get_or_emit_attribute<T>(attribute)) {
+				return false;
+			}
+			return particles.at(attribute).particle_has_attribute<T>(particle);
+		}
+
+
+		template <typename T>
+		T &get_particle_attribute(particle_id particle) {
+			attribute_id attribute = 0;
+			assert(get_or_emit_attribute<T>(attribute) && "error: attribute not found");
+			return particles.at(attribute).get_particle_attribute<T>(particle);
+		}
+
+		template <typename T>
+		T const &get_particle_attribute(particle_id particle) const {
+			attribute_id attribute = 0;
+			assert(get_or_emit_attribute<T>(attribute) && "error: attribute not found");
+			return particles.at(attribute).get_particle_attribute<T>(particle);
+		}
+
+		template <typename T>
+		T *get_particle_attribute_ptr(particle_id particle) {
+			attribute_id attribute = 0;
+			if (get_or_emit_attribute<T>(attribute)) {
+				return particles.at(attribute).get_particle_attribute_ptr<T>(particle);
+			} else {
+				return nullptr;
+			}
+		}
+
+		template <typename T>
+		T const *get_particle_attribute_const_ptr(particle_id particle) const {
+			attribute_id attribute = 0;
+			if (get_or_emit_attribute<T>(attribute)) {
+				return particles.at(attribute).get_particle_attribute_const_ptr<T>(particle);
+			} else {
+				return nullptr;
+			}
+		}
+
+
+		template <typename T>
+		T &set_particle_attribute(particle_id particle, T attribute) {
+			attribute_id attribute_id = 0;
+			if (get_or_emit_attribute<T>(attribute_id)) {
+				return *particles.at(attribute_id).set_particle_attribute<T>(particle, std::move(attribute));
+			} else {
+				attribute_map.insert({ typeid(T), attribute_id });
+				particles.push_back(attribute_storage::create_vector_storage<T>(particle_count()));
+				return *particles.at(attribute_id).set_particle_attribute<T>(particle, std::move(attribute));
+			}
+		}
+
+		
+		template <typename T>
+		bool remove_particle_attribute(particle_id particle, T &out_attribute) {
+			attribute_id attribute_id = 0;
+			if (!get_or_emit_attribute<T>(attribute_id)) {
+				return false;
+			}
+
+			return particles.at(attribute_id).remove_particle_attribute<T>(particle, out_attribute);
 		}
 
 	private:
@@ -185,7 +340,7 @@ namespace systems {
 			typename ...Attributes,
 			typename Tuple = T::particle_deconstruct
 		>
-		std::tuple<Attributes* ...> set_particle_attributes_deconstruct_impl(
+		std::tuple<Attributes& ...> set_particle_attributes_deconstruct_impl(
 			particle_id particle,
 			T const &attributes,
 			std::tuple<Attributes ...>
@@ -252,8 +407,11 @@ namespace systems {
 		}
 
 	public:
-		template <typename ...Ts>	
-		particle_count_t iter(std::function<void(Ts& ...)> const &func) {
+		template <
+			typename ...Ts,
+			typename F = std::function<void(Ts& ...)>
+		>	
+		particle_count_t iter(F const &func) {
 			particle_count_t count = 0;
 			for (size_t i = 0; i < particle_count(); ++i) {
 				bool all = true;

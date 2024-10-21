@@ -200,7 +200,7 @@ void initPhysics(bool interactive)
 	RegisterRenderItem(positive_z_render_item);
 
 	systems::particle_system s = systems::particle_system();
-	objects::acceleration3_f32 *stored =
+	objects::acceleration3_f32 &stored =
 		s.set_particle_attribute<objects::acceleration3_f32>(2, objects::acceleration3_f32(0, 1, 3));
 	objects::acceleration3_f32 got = s.get_particle_attribute<objects::acceleration3_f32>(2);
 	objects::acceleration3_f32 removed;
@@ -208,12 +208,12 @@ void initPhysics(bool interactive)
 	//bool had = s.remove_particle_attribute<objects::acceleration3_f32>(2, removed);
 	bool has = s.particle_has_attribute<objects::acceleration3_f32>(2);
 
-	size_t count = s.iter<objects::acceleration3_f32, int>
-		([](objects::acceleration3_f32 const &acc, int &pos) {
+	size_t count = s.iter<objects::acceleration3_f32 const>
+		([](objects::acceleration3_f32 const &acc) {
 		std::cout << acc.z << std::endl;
 	});
 
-	objects::particle const p = { { 4, 2, 0 }, { 0, 6, 9 } };
+	objects::mass_particle const p = { {{ 4, 2, 0 }, { 0, 6, 9 }}, 6.5 };
 	auto att = s.set_particle_attributes_deconstruct(4, p);
 
 	objects::particle r = s.get_particle_attributes_construct<objects::particle>(4);

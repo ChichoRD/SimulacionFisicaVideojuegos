@@ -2,6 +2,7 @@
 #define MASS_PARTICLE_HPP
 
 #include "particle.hpp"
+//#include "../types/particle_defs.hpp"
 
 namespace objects {
 	typedef f32 mass_f32;
@@ -19,12 +20,24 @@ namespace objects {
 	};
 
 	struct mass_particle {
+	private:
+		template <typename Tag = void>
+		struct f32_tag {
+			f32 value;
+		};
+
 	public:
 		particle particle;
 		inverse_mass_f32 inverse_mass;
 
 	public:
 		mass_particle() noexcept;
+		mass_particle(
+			v3<f32, struct previous_position> previous_position,
+			v3<f32, struct position> position,
+			v3<f32, struct velocity> velocity,
+			f32_tag<struct inverse_mass> inverse_mass
+		) noexcept;
 		mass_particle(objects::particle particle, mass_f32 mass) noexcept;
 		mass_particle(mass_particle const& other) noexcept;
 
@@ -46,6 +59,13 @@ namespace objects {
 			f32 speed_scale_factor,
 			f32 & out_gravity_scale_factor
 		) noexcept;
+
+	public:
+		using particle_deconstruct = systems::particle_trait::particle_deconstruct<
+			particle::particle_deconstruct,
+			std::tuple<f32_tag<struct inverse_mass>>
+		>;
+		particle_deconstruct deconstruct() const;
 	};
 }
 
