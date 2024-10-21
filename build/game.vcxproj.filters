@@ -7,7 +7,7 @@
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\objects\particle.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\objects\projectile.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\RenderUtils.cpp" />
-    <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_system.cpp" />
+    <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_storage.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\Render\Camera.cpp">
       <Filter>Render</Filter>
@@ -24,7 +24,7 @@
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\objects\particle.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\objects\projectile.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\RenderUtils.hpp" />
-    <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_system.hpp" />
+    <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_storage.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\particle_defs.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\Render\Camera.h">

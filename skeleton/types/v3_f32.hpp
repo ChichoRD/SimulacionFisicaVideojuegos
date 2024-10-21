@@ -59,11 +59,11 @@ namespace types {
 	public:
 		constexpr v3() noexcept
 			: x(T()), y(T()), z(T()) { }
-		v3(T x, T y, T z) noexcept
+		constexpr v3(T x, T y, T z) noexcept
 			: x(x), y(y), z(z) { }
 		
 		template <typename Other_Tag>
-		v3(v3<T, Other_Tag> const &v)
+		constexpr v3(v3<T, Other_Tag> const &v)
 			: x(v.x), y(v.y), z(v.z) { }
 
 		v3(physx::PxVec3 v) noexcept
@@ -74,6 +74,18 @@ namespace types {
 			return u.x * v.x
 				+ u.y * v.y
 				+ u.z + v.z;
+		}
+
+		constexpr static v3 cross(v3 u, v3 v) {
+			return {
+				u.y * v.z - u.z * v.y,
+				u.z * v.x - u.x * v.z,
+				u.x * v.y - u.y * v.x
+			};
+		}
+
+		constexpr static v3 lerp(v3 u, v3 v, T t) {
+			return u + (v - u) * t;
 		}
 
 	public:
@@ -107,6 +119,12 @@ namespace types {
 			this->z *= s;
 			return *this;
 		}
+		constexpr v3& operator*=(v3 const& v) noexcept {
+			this->x *= v.x;
+			this->y *= v.y;
+			this->z *= v.z;
+			return *this;
+		}
 		constexpr v3& operator/=(T const& s) noexcept {
 			this->x /= s;
 			this->y /= s;
@@ -134,6 +152,11 @@ namespace types {
 		}
 		friend constexpr v3 operator*(T s, v3 &u) noexcept {
 			u *= s;
+			return u;
+		}
+
+		friend constexpr v3 operator*(v3 u, v3 const& v) noexcept {
+			u *= v;
 			return u;
 		}
 

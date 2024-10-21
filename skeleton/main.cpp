@@ -15,7 +15,7 @@
 #include "objects/particle.hpp"
 #include "objects/mass_particle.hpp"
 #include "objects/projectile.hpp"
-#include "systems/particle_system.hpp"
+#include "systems/particle_storage.hpp"
 
 std::string display_text = "This is a test";
 
@@ -199,9 +199,9 @@ void initPhysics(bool interactive)
 	RegisterRenderItem(positive_y_render_item);
 	RegisterRenderItem(positive_z_render_item);
 
-	systems::particle_system s = systems::particle_system();
+	systems::particle_storage s = systems::particle_storage();
 	objects::acceleration3_f32 &stored =
-		s.set_particle_attribute<objects::acceleration3_f32>(2, objects::acceleration3_f32(0, 1, 3));
+		s.set_particle_attribute<objects::acceleration3_f32>(2, std::move(objects::acceleration3_f32(0, 1, 3)));
 	objects::acceleration3_f32 got = s.get_particle_attribute<objects::acceleration3_f32>(2);
 	objects::acceleration3_f32 removed;
 	std::cout << "watashi" << std::endl;

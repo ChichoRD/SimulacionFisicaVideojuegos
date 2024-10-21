@@ -1,9 +1,22 @@
 #include "particle_system.hpp"
+
 namespace systems {
-	systems::particle_system::particle_system() noexcept
-		: particles(), attribute_map() { }
-	particle_system::particle_system(size_t attribute_capacity) noexcept
-		: particles(), attribute_map(attribute_capacity) {
-		particles.reserve(attribute_capacity);
-	}
+    particle_id particle_system::add_particle() {
+        if (dead_particles.empty()) {
+            particle_id particle = particles.particle_count();
+            particles.set_particle_attribute(particle, particle_meta{true, false});
+            return particle;
+        } else {
+            particle_id particle = dead_particles.front();
+            dead_particles.pop();
+            return particle;
+        }
+    }
+
+    particle_id particle_system::remove_particle(particle_id particle) {
+        particles.clear_particle_attributes(particle);
+        particles.set_particle_attribute(particle, particle_meta{false, false});
+        dead_particles.push(particle);
+        return particle;
+    }
 }

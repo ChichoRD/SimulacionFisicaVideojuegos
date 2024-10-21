@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gamePROFILE.exe"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gameDEBUG.exe"
 		},
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gamePROFILE.pdb"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gameDEBUG.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -80,11 +80,15 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-MT"
+					"fragment" : "-MTd"
 				},
 				{
 					"backtrace" : 5,
-					"fragment" : "/Ox"
+					"fragment" : "/Od"
+				},
+				{
+					"backtrace" : 5,
+					"fragment" : "/RTCu"
 				},
 				{
 					"backtrace" : 5,
@@ -183,19 +187,19 @@
 			[
 				{
 					"backtrace" : 6,
-					"define" : "NDEBUG"
-				},
-				{
-					"backtrace" : 6,
 					"define" : "PHYSX_PROFILE_SDK"
 				},
 				{
 					"backtrace" : 6,
-					"define" : "PX_NVTX=1"
+					"define" : "PX_CHECKED=1"
 				},
 				{
 					"backtrace" : 6,
-					"define" : "PX_PROFILE=1"
+					"define" : "PX_DEBUG=1"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "PX_NVTX=1"
 				},
 				{
 					"backtrace" : 6,
@@ -220,6 +224,10 @@
 				{
 					"backtrace" : 6,
 					"define" : "_CRT_SECURE_NO_DEPRECATE"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "_DEBUG"
 				},
 				{
 					"backtrace" : 6,
@@ -297,76 +305,11 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-MT",
+				"fragment" : "-MTd",
 				"role" : "flags"
 			},
 			{
 				"fragment" : "/subsystem:console",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "/INCREMENTAL:NO",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "/LIBPATH:../../../Lib/vc14win64",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PhysX3CommonPROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PhysX3PROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PhysX3CookingPROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PhysX3CharacterKinematicPROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PhysX3ExtensionsPROFILE.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PxTaskPROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PxFoundationPROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PsFastXmlPROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "PxPvdSDKPROFILE_x64.lib",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "/LIBPATH:../../lib/vc14win64",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "UtilsPROFILE.lib",
 				"role" : "flags"
 			},
 			{
@@ -426,52 +369,52 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CommonPROFILE_x64.lib",
+				"fragment" : "PhysX3CommonDEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3PROFILE_x64.lib",
+				"fragment" : "PhysX3DEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CookingPROFILE_x64.lib",
+				"fragment" : "PhysX3CookingDEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CharacterKinematicPROFILE_x64.lib",
+				"fragment" : "PhysX3CharacterKinematicDEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3ExtensionsPROFILE.lib",
+				"fragment" : "PhysX3ExtensionsDEBUG.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxTaskPROFILE_x64.lib",
+				"fragment" : "PxTaskDEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxFoundationPROFILE_x64.lib",
+				"fragment" : "PxFoundationDEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PsFastXmlPROFILE_x64.lib",
+				"fragment" : "PsFastXmlDEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxPvdSDKPROFILE_x64.lib",
+				"fragment" : "PxPvdSDKDEBUG_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "UtilsPROFILE.lib",
+				"fragment" : "UtilsDEBUG.lib",
 				"role" : "libraries"
 			},
 			{
@@ -497,7 +440,7 @@
 		"language" : "CXX"
 	},
 	"name" : "game",
-	"nameOnDisk" : "gamePROFILE.exe",
+	"nameOnDisk" : "gameDEBUG.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -616,12 +559,12 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "systems/particle_system.cpp",
+			"path" : "systems/particle_storage.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
-			"path" : "systems/particle_system.hpp",
+			"path" : "systems/particle_storage.hpp",
 			"sourceGroupIndex" : 0
 		},
 		{

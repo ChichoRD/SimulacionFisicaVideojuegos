@@ -355,8 +355,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\objects\projectile.hpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\RenderUtils.cpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\RenderUtils.hpp" />
-    <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_system.cpp" />
-    <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_system.hpp" />
+    <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_storage.cpp" />
+    <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_storage.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\particle_defs.hpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.cpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.hpp" />

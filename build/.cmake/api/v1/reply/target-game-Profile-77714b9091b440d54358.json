@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/game.exe"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gamePROFILE.exe"
 		},
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/game.pdb"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gamePROFILE.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -191,7 +191,15 @@
 				},
 				{
 					"backtrace" : 6,
-					"define" : "PX_SUPPORT_PVD=0"
+					"define" : "PX_NVTX=1"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "PX_PROFILE=1"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "PX_SUPPORT_PVD=1"
 				},
 				{
 					"backtrace" : 6,
@@ -308,47 +316,47 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3Common_x64.lib",
+				"fragment" : "PhysX3CommonPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3_x64.lib",
+				"fragment" : "PhysX3PROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3Cooking_x64.lib",
+				"fragment" : "PhysX3CookingPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3CharacterKinematic_x64.lib",
+				"fragment" : "PhysX3CharacterKinematicPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3Extensions.lib",
+				"fragment" : "PhysX3ExtensionsPROFILE.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PxTask_x64.lib",
+				"fragment" : "PxTaskPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PxFoundation_x64.lib",
+				"fragment" : "PxFoundationPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PsFastXml_x64.lib",
+				"fragment" : "PsFastXmlPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PxPvdSDK_x64.lib",
+				"fragment" : "PxPvdSDKPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
@@ -358,7 +366,7 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "Utils.lib",
+				"fragment" : "UtilsPROFILE.lib",
 				"role" : "flags"
 			},
 			{
@@ -418,52 +426,52 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3Common_x64.lib",
+				"fragment" : "PhysX3CommonPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3_x64.lib",
+				"fragment" : "PhysX3PROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3Cooking_x64.lib",
+				"fragment" : "PhysX3CookingPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CharacterKinematic_x64.lib",
+				"fragment" : "PhysX3CharacterKinematicPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3Extensions.lib",
+				"fragment" : "PhysX3ExtensionsPROFILE.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxTask_x64.lib",
+				"fragment" : "PxTaskPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxFoundation_x64.lib",
+				"fragment" : "PxFoundationPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PsFastXml_x64.lib",
+				"fragment" : "PsFastXmlPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxPvdSDK_x64.lib",
+				"fragment" : "PxPvdSDKPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "Utils.lib",
+				"fragment" : "UtilsPROFILE.lib",
 				"role" : "libraries"
 			},
 			{
@@ -489,7 +497,7 @@
 		"language" : "CXX"
 	},
 	"name" : "game",
-	"nameOnDisk" : "game.exe",
+	"nameOnDisk" : "gamePROFILE.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -608,12 +616,12 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "systems/particle_system.cpp",
+			"path" : "systems/particle_storage.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
-			"path" : "systems/particle_system.hpp",
+			"path" : "systems/particle_storage.hpp",
 			"sourceGroupIndex" : 0
 		},
 		{
