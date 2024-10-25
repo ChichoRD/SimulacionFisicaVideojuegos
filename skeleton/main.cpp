@@ -176,34 +176,6 @@ static projectile_index instantiate_projectile(PxTransform const& camera, projec
 	return register_projectile(p, color, size) - 1;
 }
 
-
-void particle_system_spawn_particles(size_t count) {
-	for (size_t i = 0; i < count; ++i) {
-		size_t particle_id = particle_system.add_particle_random<objects::particle>(
-			[](objects::position3_f32 position, objects::velocity3_f32 velocity) {
-				return objects::particle(position, velocity * 8.0f);
-			},
-			0.0025f,
-			0.025f
-		);
-		//particle_system.set<systems::particle_system::tag_particle_id<void>>(particle_id, systems::particle_system::tag_particle_id<void>{ particle_id });
-
-		PxTransform &particle_transform = std::get<PxTransform &>(particle_system.set<PxTransform>(
-			particle_id,
-			PxTransform(types::v3_f32(0.0f, 0.0f, 0.0f))
-		));
-		particle_system.set<RenderItem *>(
-			particle_id,
-			new RenderItem(
-				CreateShape(PxSphereGeometry(2.0f)),
-				&particle_transform,
-				{ rand() % 255 / 255.0f, rand() % 255 / 255.0f, rand() % 255 / 255.0f, 1.0f }
-			)
-		);
-	}
-}
-
-
 // Initialize physics engine
 void initPhysics(bool interactive)
 {
@@ -245,7 +217,22 @@ void initPhysics(bool interactive)
 	RegisterRenderItem(positive_y_render_item);
 	RegisterRenderItem(positive_z_render_item);
 
-	particle_system_spawn_particles(100);
+	for (size_t i = 0; i < 100; ++i) {
+		size_t particle_id = particle_system.add_particle_random<objects::particle>(
+			[](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+				return objects::particle(position, velocity * 8.0f);
+			}
+		);
+
+		PxTransform &particle_transform = std::get<PxTransform &>(particle_system.set<PxTransform>(
+			particle_id,
+			PxTransform(v3_f32(0.0f, 0.0f, 0.0f))
+		));
+		particle_system.set<RenderItem *>(
+			particle_id,
+			new RenderItem(CreateShape(PxSphereGeometry(2.0f)), &particle_transform, { rand() % 255 / 255.0f, rand() % 255 / 255.0f, rand() % 255 / 255.0f, 1.0f })
+		);
+	}
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
@@ -255,52 +242,6 @@ void initPhysics(bool interactive)
 	sceneDesc.filterShader = contactReportFilterShader;
 	sceneDesc.simulationEventCallback = &gContactReportCallback;
 	gScene = gPhysics->createScene(sceneDesc);
-}
-
-
-void particle_system_destroy() {
-	particle_system.iter<RenderItem *>(
-		[](systems::particle_id &id, RenderItem *&r) {
-			DeregisterRenderItem(r);
-			delete r;
-			r = nullptr;
-		}
-	);
-
-	for (size_t i = 0; i < particle_system.particles.particle_count(); ++i) {
-		particle_system.remove_particle(i);
-	}
-}
-
-void particle_system_update(objects::seconds_f64 delta_time) {
-	if (!particle_system.active(std::time(nullptr)) && particle_system.alive_particle_count() == 0) {
-		particle_system_destroy();
-		return;
-	}
-
-	particle_system.iter<
-		systems::particle_id,
-		objects::particle::deconstruct_position,
-		objects::particle::deconstruct_velocity
-	>(
-		[delta_time](systems::particle_id &id, objects::particle::deconstruct_position &p, objects::particle::deconstruct_velocity &v) {
-			objects::particle particle(p, v);
-			particle.integrate_midpoint(types::v3_f32(0, -9.8f, 0), 0.9875f, delta_time);
-
-			p = particle.position;
-			v = particle.velocity;
-		}
-	);
-
-	particle_system.iter<
-		systems::particle_id,
-		objects::particle::deconstruct_position const,
-		PxTransform
-	>(
-		[](systems::particle_id &id, objects::particle::deconstruct_position const &p, PxTransform &t) {
-			t = PxTransform(p);
-		}
-	);
 }
 
 
@@ -321,7 +262,29 @@ void stepPhysics(bool interactive, double t)
 		}
 	}
 
-	particle_system_update(t);
+	// update
+	particle_system.iter<
+		objects::particle::deconstruct_position,
+		objects::particle::deconstruct_velocity
+	>(
+		[g, t](objects::particle::deconstruct_position &position, objects::particle::deconstruct_velocity &velocity) {
+			objects::particle p = { position, velocity };
+			p.integrate_midpoint(g, 0.9875f, t);
+
+			position = p.position;
+			velocity = p.velocity;
+		}
+	);
+
+	particle_system.iter<
+		objects::particle::deconstruct_position const,
+		PxTransform
+	>(
+		[](objects::particle::deconstruct_position const &position, PxTransform &particle_transform) {
+			particle_transform.p = physx::PxVec3(position.x, position.y, position.z);
+			std::cout << position.x << " " << position.y << " " << position.z << std::endl;
+		}
+	);
 
 	gScene->simulate(t);
 	gScene->fetchResults(true);
@@ -339,8 +302,23 @@ void cleanupPhysics(bool interactive)
 	DeregisterRenderItem(positive_x_render_item);
 	DeregisterRenderItem(origin_render_item);
 
-	particle_system_destroy();
+	for (RenderItem *r : projectile_render_items) {
+		DeregisterRenderItem(r);
+		delete r;
+	}
+	
+	particle_system.iter<
+		RenderItem *
+	>(
+		[](RenderItem *r) {
+			DeregisterRenderItem(r);
+			delete r;
+		}
+	);
 
+	for (size_t i = 0; i < particle_system.particles.particle_count(); ++i) {
+		particle_system.remove_particle(i);
+	}
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
 	gScene->release();
