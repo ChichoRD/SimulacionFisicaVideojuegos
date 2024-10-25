@@ -6,10 +6,10 @@ namespace objects {
 	mass_particle::mass_particle() noexcept
 		: particle(), inverse_mass(1.0f) { }
     mass_particle::mass_particle(
-		v3<f32, struct previous_position> previous_position,
-		v3<f32, struct position> position,
-		v3<f32, struct velocity> velocity,
-		f32_tag<struct inverse_mass> inverse_mass
+		particle::deconstruct_previous_position previous_position,
+		particle::deconstruct_position position,
+		particle::deconstruct_velocity velocity,
+		deconstruct_inverse_mass inverse_mass
 	) noexcept
 		: particle(previous_position, position, velocity), inverse_mass(inverse_mass.value) { }
     mass_particle::mass_particle(objects::particle particle, mass_f32 mass) noexcept

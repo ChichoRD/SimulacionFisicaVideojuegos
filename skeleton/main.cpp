@@ -11,11 +11,13 @@
 #include <iostream>
 
 #include <cassert>
+#include <cstdlib>
 #include "types/v3_f32.hpp"
 #include "objects/particle.hpp"
 #include "objects/mass_particle.hpp"
 #include "objects/projectile.hpp"
-#include "systems/particle_storage.hpp"
+//#include "systems/particle_storage.hpp"
+#include "systems/particle_system.hpp"
 
 std::string display_text = "This is a test";
 
@@ -36,6 +38,22 @@ PxPvd*                  gPvd        = NULL;
 PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
+
+systems::particle_system particle_system = systems::particle_system(
+	systems::particle_generator(
+		systems::particle_generator::UNIFORM,
+		systems::particle_generator::CONE,
+		systems::particle_generator::generation_volume(
+			systems::generation_cone{ 
+				types::v3_f32(0.0f, 10.0f, 0.0f),
+				types::v3_f32(0.0f, 0.0f, 0.0f),
+			 	1.0f,
+				1.0f
+			}
+		)
+	),
+	5.0f * 1000.0f
+);
 
 
 RenderItem *origin_render_item = NULL;
@@ -158,6 +176,34 @@ static projectile_index instantiate_projectile(PxTransform const& camera, projec
 	return register_projectile(p, color, size) - 1;
 }
 
+
+void particle_system_spawn_particles(size_t count) {
+	for (size_t i = 0; i < count; ++i) {
+		size_t particle_id = particle_system.add_particle_random<objects::particle>(
+			[](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+				return objects::particle(position, velocity * 8.0f);
+			},
+			0.0025f,
+			0.025f
+		);
+		//particle_system.set<systems::particle_system::tag_particle_id<void>>(particle_id, systems::particle_system::tag_particle_id<void>{ particle_id });
+
+		PxTransform &particle_transform = std::get<PxTransform &>(particle_system.set<PxTransform>(
+			particle_id,
+			PxTransform(types::v3_f32(0.0f, 0.0f, 0.0f))
+		));
+		particle_system.set<RenderItem *>(
+			particle_id,
+			new RenderItem(
+				CreateShape(PxSphereGeometry(2.0f)),
+				&particle_transform,
+				{ rand() % 255 / 255.0f, rand() % 255 / 255.0f, rand() % 255 / 255.0f, 1.0f }
+			)
+		);
+	}
+}
+
+
 // Initialize physics engine
 void initPhysics(bool interactive)
 {
@@ -199,24 +245,7 @@ void initPhysics(bool interactive)
 	RegisterRenderItem(positive_y_render_item);
 	RegisterRenderItem(positive_z_render_item);
 
-	systems::particle_storage s = systems::particle_storage();
-	objects::acceleration3_f32 &stored =
-		s.set_particle_attribute<objects::acceleration3_f32>(2, std::move(objects::acceleration3_f32(0, 1, 3)));
-	objects::acceleration3_f32 got = s.get_particle_attribute<objects::acceleration3_f32>(2);
-	objects::acceleration3_f32 removed;
-	std::cout << "watashi" << std::endl;
-	//bool had = s.remove_particle_attribute<objects::acceleration3_f32>(2, removed);
-	bool has = s.particle_has_attribute<objects::acceleration3_f32>(2);
-
-	size_t count = s.iter<objects::acceleration3_f32 const>
-		([](objects::acceleration3_f32 const &acc) {
-		std::cout << acc.z << std::endl;
-	});
-
-	objects::mass_particle const p = { {{ 4, 2, 0 }, { 0, 6, 9 }}, 6.5 };
-	auto att = s.set_particle_attributes_deconstruct(4, p);
-
-	objects::particle r = s.get_particle_attributes_construct<objects::particle>(4);
+	particle_system_spawn_particles(100);
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
@@ -226,6 +255,52 @@ void initPhysics(bool interactive)
 	sceneDesc.filterShader = contactReportFilterShader;
 	sceneDesc.simulationEventCallback = &gContactReportCallback;
 	gScene = gPhysics->createScene(sceneDesc);
+}
+
+
+void particle_system_destroy() {
+	particle_system.iter<RenderItem *>(
+		[](systems::particle_id &id, RenderItem *&r) {
+			DeregisterRenderItem(r);
+			delete r;
+			r = nullptr;
+		}
+	);
+
+	for (size_t i = 0; i < particle_system.particles.particle_count(); ++i) {
+		particle_system.remove_particle(i);
+	}
+}
+
+void particle_system_update(objects::seconds_f64 delta_time) {
+	if (!particle_system.active(std::time(nullptr)) && particle_system.alive_particle_count() == 0) {
+		particle_system_destroy();
+		return;
+	}
+
+	particle_system.iter<
+		systems::particle_id,
+		objects::particle::deconstruct_position,
+		objects::particle::deconstruct_velocity
+	>(
+		[delta_time](systems::particle_id &id, objects::particle::deconstruct_position &p, objects::particle::deconstruct_velocity &v) {
+			objects::particle particle(p, v);
+			particle.integrate_midpoint(types::v3_f32(0, -9.8f, 0), 0.9875f, delta_time);
+
+			p = particle.position;
+			v = particle.velocity;
+		}
+	);
+
+	particle_system.iter<
+		systems::particle_id,
+		objects::particle::deconstruct_position const,
+		PxTransform
+	>(
+		[](systems::particle_id &id, objects::particle::deconstruct_position const &p, PxTransform &t) {
+			t = PxTransform(p);
+		}
+	);
 }
 
 
@@ -246,6 +321,8 @@ void stepPhysics(bool interactive, double t)
 		}
 	}
 
+	particle_system_update(t);
+
 	gScene->simulate(t);
 	gScene->fetchResults(true);
 }
@@ -262,10 +339,7 @@ void cleanupPhysics(bool interactive)
 	DeregisterRenderItem(positive_x_render_item);
 	DeregisterRenderItem(origin_render_item);
 
-	for (RenderItem *r : projectile_render_items) {
-		DeregisterRenderItem(r);
-		delete r;
-	}
+	particle_system_destroy();
 
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++

@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/game.exe"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gamePROFILE.exe"
 		},
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/game.pdb"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gamePROFILE.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -33,43 +33,43 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 166,
+				"line" : 170,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 317,
+				"line" : 321,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 426,
+				"line" : 430,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 424,
+				"line" : 428,
 				"parent" : 0
 			},
 			{
 				"command" : 4,
 				"file" : 0,
-				"line" : 279,
+				"line" : 283,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 241,
+				"line" : 245,
 				"parent" : 0
 			},
 			{
 				"command" : 6,
 				"file" : 0,
-				"line" : 226,
+				"line" : 230,
 				"parent" : 0
 			}
 		]
@@ -191,7 +191,15 @@
 				},
 				{
 					"backtrace" : 6,
-					"define" : "PX_SUPPORT_PVD=0"
+					"define" : "PX_NVTX=1"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "PX_PROFILE=1"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "PX_SUPPORT_PVD=1"
 				},
 				{
 					"backtrace" : 6,
@@ -271,9 +279,11 @@
 				9,
 				11,
 				13,
-				16,
-				18,
-				20
+				15,
+				17,
+				20,
+				22,
+				24
 			]
 		}
 	],
@@ -308,47 +318,47 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3Common_x64.lib",
+				"fragment" : "PhysX3CommonPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3_x64.lib",
+				"fragment" : "PhysX3PROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3Cooking_x64.lib",
+				"fragment" : "PhysX3CookingPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3CharacterKinematic_x64.lib",
+				"fragment" : "PhysX3CharacterKinematicPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PhysX3Extensions.lib",
+				"fragment" : "PhysX3ExtensionsPROFILE.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PxTask_x64.lib",
+				"fragment" : "PxTaskPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PxFoundation_x64.lib",
+				"fragment" : "PxFoundationPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PsFastXml_x64.lib",
+				"fragment" : "PsFastXmlPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "PxPvdSDK_x64.lib",
+				"fragment" : "PxPvdSDKPROFILE_x64.lib",
 				"role" : "flags"
 			},
 			{
@@ -358,7 +368,7 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "Utils.lib",
+				"fragment" : "UtilsPROFILE.lib",
 				"role" : "flags"
 			},
 			{
@@ -418,52 +428,52 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3Common_x64.lib",
+				"fragment" : "PhysX3CommonPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3_x64.lib",
+				"fragment" : "PhysX3PROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3Cooking_x64.lib",
+				"fragment" : "PhysX3CookingPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CharacterKinematic_x64.lib",
+				"fragment" : "PhysX3CharacterKinematicPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3Extensions.lib",
+				"fragment" : "PhysX3ExtensionsPROFILE.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxTask_x64.lib",
+				"fragment" : "PxTaskPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxFoundation_x64.lib",
+				"fragment" : "PxFoundationPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PsFastXml_x64.lib",
+				"fragment" : "PsFastXmlPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxPvdSDK_x64.lib",
+				"fragment" : "PxPvdSDKPROFILE_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "Utils.lib",
+				"fragment" : "UtilsPROFILE.lib",
 				"role" : "libraries"
 			},
 			{
@@ -489,7 +499,7 @@
 		"language" : "CXX"
 	},
 	"name" : "game",
-	"nameOnDisk" : "game.exe",
+	"nameOnDisk" : "gamePROFILE.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -518,17 +528,21 @@
 				14,
 				15,
 				16,
-				17
+				17,
+				18,
+				19,
+				20,
+				21
 			]
 		},
 		{
 			"name" : "Render",
 			"sourceIndexes" : 
 			[
-				18,
-				19,
-				20,
-				21
+				22,
+				23,
+				24,
+				25
 			]
 		}
 	],
@@ -614,6 +628,28 @@
 		{
 			"backtrace" : 1,
 			"path" : "systems/particle_storage.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "systems/particle_generator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "systems/particle_generator.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "systems/particle_system.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "systems/particle_system.hpp",
 			"sourceGroupIndex" : 0
 		},
 		{

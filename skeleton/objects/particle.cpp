@@ -9,9 +9,9 @@ namespace objects {
 		: previous_position(position), position(position), velocity(velocity) { }
 
 	particle::particle(
-		v3<f32, struct previous_position> previous_position,
-		v3<f32, struct position> position,
-		v3<f32, struct velocity> velocity
+		deconstruct_previous_position previous_position,
+		deconstruct_position position,
+		deconstruct_velocity velocity
 	) noexcept
 		: previous_position(previous_position), position(position), velocity(velocity) { }
 

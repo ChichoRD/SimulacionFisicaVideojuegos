@@ -165,7 +165,7 @@ namespace types {
 			return u;
 		}
 
-		operator physx::PxVec3() {
+		operator physx::PxVec3() const {
 			return physx::PxVec3(x, y, z);
 		}
 	};

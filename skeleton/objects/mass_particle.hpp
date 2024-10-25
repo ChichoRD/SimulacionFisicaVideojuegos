@@ -25,6 +25,8 @@ namespace objects {
 		struct f32_tag {
 			f32 value;
 		};
+	public:
+		using deconstruct_inverse_mass = f32_tag<struct inverse_mass>;
 
 	public:
 		particle particle;
@@ -33,10 +35,10 @@ namespace objects {
 	public:
 		mass_particle() noexcept;
 		mass_particle(
-			v3<f32, struct previous_position> previous_position,
-			v3<f32, struct position> position,
-			v3<f32, struct velocity> velocity,
-			f32_tag<struct inverse_mass> inverse_mass
+			particle::deconstruct_previous_position previous_position,
+			particle::deconstruct_position position,
+			particle::deconstruct_velocity velocity,
+			deconstruct_inverse_mass inverse_mass
 		) noexcept;
 		mass_particle(objects::particle particle, mass_f32 mass) noexcept;
 		mass_particle(mass_particle const& other) noexcept;
@@ -63,7 +65,7 @@ namespace objects {
 	public:
 		using particle_deconstruct = systems::particle_trait::particle_deconstruct<
 			particle::particle_deconstruct,
-			std::tuple<f32_tag<struct inverse_mass>>
+			std::tuple<deconstruct_inverse_mass>
 		>;
 		particle_deconstruct deconstruct() const;
 	};

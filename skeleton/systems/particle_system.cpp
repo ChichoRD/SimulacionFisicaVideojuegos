@@ -1,6 +1,13 @@
 #include "particle_system.hpp"
 
 namespace systems {
+    particle_system::particle_system(particle_generator generator, size_t lifetime_milliseconds)
+        : particles(),
+        dead_particles(),
+        generator(generator),
+        start_time(std::time(nullptr)),
+        lifetime_milliseconds(lifetime_milliseconds) {}
+
     particle_id particle_system::add_particle() {
         if (dead_particles.empty()) {
             particle_id particle = particles.particle_count();

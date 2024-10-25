@@ -1,6 +1,10 @@
+#ifndef PARTICLE_GENERATOR_HPP
+#define PARTICLE_GENERATOR_HPP
+
 #include <random>
 #include <cmath>
 #include <array>
+#include <limits>
 
 #include "../types/v3_f32.hpp"
 
@@ -46,9 +50,9 @@ namespace systems {
             types::f32 sin_phi = std::sinf(phi);
             types::f32 cos_phi = std::cosf(phi);
 
-            types::f32 x = r * sinPhi * cosTheta;
-            types::f32 y = r * sinPhi * sinTheta;
-            types::f32 z = r * cosPhi;
+            types::f32 x = r * sin_phi * cos_theta;
+            types::f32 y = r * sin_phi * sin_theta;
+            types::f32 z = r * cos_phi;
             return { x, y, z };
         }
 
@@ -59,7 +63,7 @@ namespace systems {
 
         template <typename Generator>
         inline types::v3_f32 random_normal(Generator &generator, types::f32 standard_deviation) const {
-            return centre + (random_unit_uniform(generator) * {
+            return centre + (random_unit_uniform(generator) * types::v3_f32{
                 std::normal_distribution<types::f32>(radii.x, standard_deviation)(generator),
                 std::normal_distribution<types::f32>(radii.y, standard_deviation)(generator),
                 std::normal_distribution<types::f32>(radii.z, standard_deviation)(generator)
@@ -82,10 +86,10 @@ namespace systems {
                 {0.0f, 0.0f, 1.0f}
             };
             size_t min_basis_index = 0;
-            types::f32 min_basis_dot = std::numeric_limits<types::f32>::max();
+            types::f32 min_basis_dot = (std::numeric_limits<types::f32>::max)();
             for (size_t i = 0; i < basis.size(); ++i) {
                 types::f32 dot = types::v3_f32::dot(axis, basis[i]);
-                if (dot < min_basis_dot) {
+                if (std::abs(dot) < std::abs(min_basis_dot)) {
                     min_basis_dot = dot;
                     min_basis_index = i;
                 }
@@ -123,7 +127,7 @@ namespace systems {
             Generator &generator,
             types::f32 begin_normalized = 0.0f,
             types::f32 end_normalized = 1.0f,
-            types::f32 standard_deviation
+            types::f32 standard_deviation = 1.0f
         ) const {
             types::f32 const theta = std::uniform_real<types::f32>(0.0f, 2.0f * std::_Pi_val)(generator);
             types::f32 const r = std::sqrtf(std::normal_distribution<types::f32>(1.0f, standard_deviation)(generator));
@@ -182,7 +186,7 @@ namespace systems {
             Generator &generator,
             types::f32 begin_normalized = 0.0f,
             types::f32 end_normalized = 1.0f,
-            types::f32 standard_deviation
+            types::f32 standard_deviation = 1.0f
         ) const {
             types::f32 const theta = std::uniform_real<types::f32>(0.0f, 2.0f * std::_Pi_val)(generator);
             types::f32 const r = std::sqrtf(std::normal_distribution<types::f32>(1.0f, standard_deviation)(generator));
@@ -218,5 +222,63 @@ namespace systems {
             CYLINDER,
             CONE,
         };
+
+        union generation_volume {
+            generation_box box;
+            generation_ellipsoid ellipsoid;
+            generation_cylinder cylinder;
+            generation_cone cone;
+
+            generation_volume(generation_box box) : box(box) { }
+            generation_volume(generation_ellipsoid ellipsoid) : ellipsoid(ellipsoid) { }
+            generation_volume(generation_cylinder cylinder) : cylinder(cylinder) { }
+            generation_volume(generation_cone cone) : cone(cone) { }
+        };
+
+        generation_volume volume;
+        generation_shape shape;
+        distribution_type distribution;
+        std::default_random_engine generator;
+
+public:
+        particle_generator(distribution_type distribution, generation_shape shape, generation_volume volume);
+
+public:
+        types::v3_f32 generate_position_outwards(
+            types::v3_f32 &out_outwards_direction,
+            types::f32 begin_normalized = 0.0f,
+            types::f32 end_normalized = 1.0f,
+            types::f32 standard_deviation = 1.0f
+        );
+
+        friend static types::v3_f32 generate_uniform_position_outwards(
+            particle_generator const &generator,
+            types::v3_f32 &out_outwards_direction,
+            types::f32 begin_normalized = 0.0f,
+            types::f32 end_normalized = 1.0f
+        );
+        friend static types::v3_f32 generate_normal_position_outwards(
+            particle_generator const &generator,
+            types::v3_f32 &out_outwards_direction,
+            types::f32 begin_normalized = 0.0f,
+            types::f32 end_normalized = 1.0f,
+            types::f32 standard_deviation = 1.0f
+        );
     };
+
+    static types::v3_f32 generate_uniform_position_outwards(
+        particle_generator &generator,
+        types::v3_f32 &out_outwards_direction,
+        types::f32 begin_normalized = 0.0f,
+        types::f32 end_normalized = 1.0f
+    );
+    static types::v3_f32 generate_normal_position_outwards(
+        particle_generator &generator,
+        types::v3_f32 &out_outwards_direction,
+        types::f32 begin_normalized = 0.0f,
+        types::f32 end_normalized = 1.0f,
+        types::f32 standard_deviation = 1.0f
+    );
 }
+
+#endif

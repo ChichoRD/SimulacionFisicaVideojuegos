@@ -17,6 +17,11 @@ namespace objects {
 
 	struct particle {
 	public:
+		using deconstruct_previous_position = v3<f32, struct previous_position>;
+		using deconstruct_position = v3<f32, struct position>;
+		using deconstruct_velocity = v3<f32, struct velocity>;
+
+	public:
 		position3_f32 previous_position;
 		position3_f32 position;
 		velocity3_f32 velocity;
@@ -25,9 +30,9 @@ namespace objects {
 		particle() noexcept;
 		particle(position3_f32 position, velocity3_f32 velocity) noexcept;
 		particle(
-			v3<f32, struct previous_position> previous_position,
-			v3<f32, struct position> position,
-			v3<f32, struct velocity> velocity
+			deconstruct_previous_position previous_position,
+			deconstruct_position position,
+			deconstruct_velocity velocity
 		) noexcept;
 		particle(particle const &other) noexcept;
 		~particle();
@@ -69,7 +74,7 @@ namespace objects {
 
 	public:
 		using particle_deconstruct = systems::particle_trait::particle_deconstruct
-			<v3<f32, struct previous_position>, v3<f32, struct position>, v3<f32, struct velocity>>;
+			<deconstruct_previous_position, deconstruct_position, deconstruct_velocity>;
 		particle_deconstruct deconstruct() const;
 	};
 }

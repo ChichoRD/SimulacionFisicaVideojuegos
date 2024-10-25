@@ -1,3 +1,6 @@
+#ifndef PARTICLE_STORAGE_HPP
+#define PARTICLE_STORAGE_HPP
+
 #include <vector>
 #include <cstdint>
 #include <any>
@@ -27,8 +30,7 @@ namespace systems {
 		};
 
 	public:
-		std::type_info const &type_info;
-		size_t const type_size;
+		size_t type_size;
 
 		std::vector<bool> mask;
 		std::vector<uint8_t> data;
@@ -36,21 +38,23 @@ namespace systems {
 
 	public:
 		attribute_storage();
+		attribute_storage(size_t particle_capacity, storage_type storage_type, size_t type_size);
 
-		attribute_storage(size_t particle_capacity, storage_type storage_type, std::type_info const &type_info, size_t type_size);
+		attribute_storage(attribute_storage &&other);
+		attribute_storage &operator=(attribute_storage &&other);
 
 		template <typename T>
 		static inline attribute_storage create_vector_storage(size_t particle_capacity) {
-			return attribute_storage(particle_capacity, storage_type::VECTOR, typeid(T), sizeof(T));
+			return attribute_storage(particle_capacity, storage_type::VECTOR, sizeof(T));
 		}
 
 		static inline attribute_storage create_unit_storage(size_t particle_capacity) {
-			return attribute_storage(particle_capacity, storage_type::UNIT, typeid(bool), sizeof(bool));
+			return attribute_storage(particle_capacity, storage_type::UNIT, sizeof(bool));
 		}
 
 		template <typename T>
 		static inline attribute_storage create_shared_storage(size_t particle_capacity) {
-			return attribute_storage(particle_capacity, storage_type::SHARED, typeid(T), sizeof(T));
+			return attribute_storage(particle_capacity, storage_type::SHARED, sizeof(T));
 		}
 
 	public:
@@ -82,7 +86,6 @@ namespace systems {
 
 		template <typename T>
 		T& get_particle_attribute(particle_id particle) {
-			assert(typeid(T) == type_info && "error: attempted to access attribute of wrong type");
 			return *static_cast<T*>(get_particle_attribute_ptr(particle));
 		}
 
@@ -96,7 +99,6 @@ namespace systems {
 
 		template <typename T>
 		T &set_particle_attribute(particle_id particle, T const &attribute) {
-			assert(typeid(T) == type_info && "error: attempted to access attribute of wrong type");
 			return *static_cast<T*>(set_particle_attribute_ptr(
 				particle,
 				&attribute
@@ -198,7 +200,7 @@ namespace systems {
 				return particles.at(attribute_id).set_particle_attribute(particle, attribute);
 			} else {
 				attribute_map.insert({ typeid(T), attribute_id });
-				particles.push_back(attribute_storage::create_vector_storage<T>(particle_count()));
+				particles.emplace_back(attribute_storage::create_vector_storage<T>(particle_count()));
 				return particles.at(attribute_id).set_particle_attribute(particle, attribute);
 			}
 		}
@@ -348,3 +350,5 @@ namespace systems {
 		}
 	};
 }
+
+#endif
