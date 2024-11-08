@@ -76,6 +76,10 @@ namespace types {
 				+ u.z + v.z;
 		}
 
+		constexpr static v3 project(v3 v, v3 normal) {
+			return normal.normalized() * dot(v, normal.dot_inverse());
+		}
+
 		constexpr static v3 cross(v3 u, v3 v) {
 			return {
 				u.y * v.z - u.z * v.y,

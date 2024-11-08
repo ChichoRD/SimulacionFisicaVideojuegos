@@ -65,7 +65,7 @@ namespace objects {
 	public:
 		using particle_deconstruct = systems::particle_trait::particle_deconstruct<
 			particle::particle_deconstruct,
-			std::tuple<deconstruct_inverse_mass>
+			deconstruct_inverse_mass
 		>;
 		particle_deconstruct deconstruct() const;
 	};

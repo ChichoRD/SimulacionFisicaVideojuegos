@@ -18,6 +18,11 @@
 #include "objects/projectile.hpp"
 //#include "systems/particle_storage.hpp"
 #include "systems/particle_system.hpp"
+//#include "systems/particle_generator.hpp"
+
+#include "systems/force_composer.hpp"
+#include "generators/gravity_generator.hpp"
+#include "generators/wind_generator.hpp"
 
 std::string display_text = "This is a test";
 
@@ -55,6 +60,38 @@ systems::particle_system particle_system = systems::particle_system(
 	5.0f * 1000.0f
 );
 
+generators::wind_generator wind_generator = generators::wind_generator(
+	types::v3_f32(0.0f, 0.0f, 0.0f),
+	100.0f,
+	types::v3_f32(-10.0f, 0.0f, 0.0f),
+	1.0f,
+	0.025f
+);
+
+generators::gravity_generator gravity_generator = generators::gravity_generator(
+	types::v3_f32(0.0f, -generators::gravity_generator::earth_radius, 0.0f),
+	generators::gravity_generator::earth_mass
+);
+
+generators::tornado_generator tornado_generator = generators::tornado_generator(
+	types::v3_f32(0.0f, -5.0f, 0.0f),
+	types::v3_f32(0.0f, 1.0f, 0.0f),
+	100.0f,
+	25.0f,
+	1500.0f	
+);
+
+struct combined_generator {
+	generators::gravity_generator gravity_generator;
+	generators::wind_generator wind_generator;
+	generators::tornado_generator tornado_generator;
+
+	void apply_to_particles(systems::particle_system &particle_system, objects::seconds_f64 delta_time) {
+		gravity_generator.apply_to_particles(particle_system, delta_time);
+		//wind_generator.apply_to_particles(particle_system, delta_time);
+		tornado_generator.apply_to_particles(particle_system, delta_time);
+	}
+};
 
 RenderItem *origin_render_item = NULL;
 PxTransform origin_transform;
@@ -194,6 +231,7 @@ void initPhysics(bool interactive)
 
 	// axis:
 	using namespace types;
+	//gScene.
 	const f32 spacing = 10.0f;
 	origin_transform = PxTransform(v3_f32(0.0f, 0.0f, 0.0f));
 	positive_x_transform = PxTransform(v3_f32(spacing, 0.0f, 0.0f));
@@ -218,19 +256,33 @@ void initPhysics(bool interactive)
 	RegisterRenderItem(positive_z_render_item);
 
 	for (size_t i = 0; i < 100; ++i) {
-		size_t particle_id = particle_system.add_particle_random<objects::particle>(
-			[](objects::position3_f32 position, objects::velocity3_f32 velocity) {
-				return objects::particle(position, velocity * 8.0f);
-			}
+		objects::mass_f32 min_mass = 0.1f;
+		objects::mass_f32 max_mass = 10.0f;
+		float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
+		objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
+
+		size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
+			[mass](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+				return objects::mass_particle(objects::particle{position, velocity * 8.0f}, mass);
+			}, 0.5f, 1.0f
 		);
 
 		PxTransform &particle_transform = std::get<PxTransform &>(particle_system.set<PxTransform>(
 			particle_id,
 			PxTransform(v3_f32(0.0f, 0.0f, 0.0f))
 		));
+
+		types::v3_f32 low_mass_colour = { 0.15f, 0.05f, 0.95f };
+		types::v3_f32 high_mass_colour = { 0.95f, 0.15f, 0.05f };
+		types::v3_f32 colour = types::v3_f32::lerp(low_mass_colour, high_mass_colour, normalized_mass);
 		particle_system.set<RenderItem *>(
 			particle_id,
-			new RenderItem(CreateShape(PxSphereGeometry(2.0f)), &particle_transform, { rand() % 255 / 255.0f, rand() % 255 / 255.0f, rand() % 255 / 255.0f, 1.0f })
+			new RenderItem(CreateShape(PxSphereGeometry(2.0f)), &particle_transform, {
+				colour.x,
+				colour.y,
+				colour.z,
+				1.0f
+			})
 		);
 	}
 
@@ -262,19 +314,28 @@ void stepPhysics(bool interactive, double t)
 		}
 	}
 
-	// update
-	particle_system.iter<
-		objects::particle::deconstruct_position,
-		objects::particle::deconstruct_velocity
-	>(
-		[g, t](objects::particle::deconstruct_position &position, objects::particle::deconstruct_velocity &velocity) {
-			objects::particle p = { position, velocity };
-			p.integrate_midpoint(g, 0.9875f, t);
+	auto force_composer = systems::force_composer<combined_generator>(combined_generator{
+		gravity_generator,
+		wind_generator,
+		tornado_generator
+	});
 
-			position = p.position;
-			velocity = p.velocity;
-		}
-	);
+	// update
+	force_composer.apply_to_particles(particle_system, t);
+	force_composer.compose_forces(particle_system, t);
+
+	// particle_system.iter<
+	// 	objects::particle::deconstruct_position,
+	// 	objects::particle::deconstruct_velocity
+	// >(
+	// 	[g, t](objects::particle::deconstruct_position &position, objects::particle::deconstruct_velocity &velocity) {
+	// 		objects::particle p = { position, velocity };
+	// 		p.integrate_midpoint(g, 0.9875f, t);
+
+	// 		position = p.position;
+	// 		velocity = p.velocity;
+	// 	}
+	// );
 
 	particle_system.iter<
 		objects::particle::deconstruct_position const,
@@ -282,7 +343,7 @@ void stepPhysics(bool interactive, double t)
 	>(
 		[](objects::particle::deconstruct_position const &position, PxTransform &particle_transform) {
 			particle_transform.p = physx::PxVec3(position.x, position.y, position.z);
-			std::cout << position.x << " " << position.y << " " << position.z << std::endl;
+			// std::cout << position.x << " " << position.y << " " << position.z << std::endl;
 		}
 	);
 

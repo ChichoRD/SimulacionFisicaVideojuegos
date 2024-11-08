@@ -77,6 +77,10 @@ namespace objects {
 			<deconstruct_previous_position, deconstruct_position, deconstruct_velocity>;
 		particle_deconstruct deconstruct() const;
 	};
+
+	namespace generators {
+		using particle_force = v3<f32, struct force>;
+	}
 }
 
 #endif // !PARTICLE_HPP
