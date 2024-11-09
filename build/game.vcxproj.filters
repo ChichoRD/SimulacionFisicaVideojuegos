@@ -12,6 +12,7 @@
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\particle_system.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\gravity_generator.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\wind_generator.cpp" />
+    <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\explosion_generator.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.cpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\Render\Camera.cpp">
       <Filter>Render</Filter>
@@ -33,6 +34,7 @@
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\systems\force_composer.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\gravity_generator.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\wind_generator.hpp" />
+    <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\explosion_generator.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\particle_defs.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\Render\Camera.h">

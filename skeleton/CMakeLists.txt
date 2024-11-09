@@ -149,6 +149,8 @@ set(no_group_source_files
     "generators/gravity_generator.hpp"
     "generators/wind_generator.cpp"
     "generators/wind_generator.hpp"
+    "generators/explosion_generator.cpp"
+    "generators/explosion_generator.hpp"
     "types/particle_defs.hpp"
     "types/v3_f32.cpp"
     "types/v3_f32.hpp"

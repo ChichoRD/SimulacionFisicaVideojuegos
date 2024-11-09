@@ -113,6 +113,14 @@ namespace systems {
 		inline particle_count_t iter(F const &func) {
             return particles.iter<Ts...>(func);
         }
+
+        template <
+			typename ...Ts,
+			typename F = std::function<void(particle_id, Ts& ...)>
+		>	
+		inline particle_count_t iter_indexed(F const &func) {
+            return particles.iter_indexed<Ts...>(func);
+        }
     };
 }
 

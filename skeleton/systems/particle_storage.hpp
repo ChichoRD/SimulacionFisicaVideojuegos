@@ -349,6 +349,31 @@ namespace systems {
 
 			return count;
 		}
+
+		template <
+			typename ...Ts,
+			typename F = std::function<void(particle_id, Ts& ...)>
+		>	
+		particle_count_t iter_indexed(F const &func) {
+			particle_count_t count = 0;
+			for (size_t i = 0; i < particle_count(); ++i) {
+				bool all = true;
+				std::tuple<Ts* ...> attributes = {
+					[&]() {
+						Ts* ptr = get_particle_attribute_ptr<Ts>(i);
+						all &= ptr != nullptr;
+						return ptr;
+					}()...
+				};
+
+				if (all) {
+					++count;
+					call(func, std::tuple_cat(std::make_tuple(i), make_references(attributes)));
+				}
+			}
+
+			return count;
+		}
 	};
 }
 

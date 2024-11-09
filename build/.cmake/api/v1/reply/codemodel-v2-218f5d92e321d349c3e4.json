@@ -57,7 +57,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "game::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-game-Checked-33a1d1f72ba9d572ef64.json",
+					"jsonFile" : "target-game-Checked-a70a081f06b5d9315c2d.json",
 					"name" : "game",
 					"projectIndex" : 0
 				}
@@ -119,7 +119,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "game::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-game-Debug-948cf80667f346dd11ec.json",
+					"jsonFile" : "target-game-Debug-4558adc1ed7574174955.json",
 					"name" : "game",
 					"projectIndex" : 0
 				}
@@ -181,7 +181,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "game::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-game-Profile-bc069508ba2071010597.json",
+					"jsonFile" : "target-game-Profile-aab80033e4c87735a352.json",
 					"name" : "game",
 					"projectIndex" : 0
 				}
@@ -243,7 +243,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "game::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-game-Release-9da175ef83ec7f3abc8d.json",
+					"jsonFile" : "target-game-Release-3e0bd855bd40ee55a154.json",
 					"name" : "game",
 					"projectIndex" : 0
 				}

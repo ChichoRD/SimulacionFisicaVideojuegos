@@ -142,6 +142,22 @@
 			"value" : "/DWIN32 /D_WINDOWS /GR /EHsc"
 		},
 		{
+			"name" : "CMAKE_CXX_FLAGS_CHECKED",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the CXX compiler during CHECKED builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
 			"name" : "CMAKE_CXX_FLAGS_DEBUG",
 			"properties" : 
 			[
@@ -172,6 +188,22 @@
 			],
 			"type" : "STRING",
 			"value" : "/O1 /Ob1 /DNDEBUG"
+		},
+		{
+			"name" : "CMAKE_CXX_FLAGS_PROFILE",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the CXX compiler during PROFILE builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_CXX_FLAGS_RELEASE",
@@ -250,6 +282,22 @@
 			"value" : "/machine:x64"
 		},
 		{
+			"name" : "CMAKE_EXE_LINKER_FLAGS_CHECKED",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during CHECKED builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
 			"name" : "CMAKE_EXE_LINKER_FLAGS_DEBUG",
 			"properties" : 
 			[
@@ -280,6 +328,22 @@
 			],
 			"type" : "STRING",
 			"value" : "/INCREMENTAL:NO"
+		},
+		{
+			"name" : "CMAKE_EXE_LINKER_FLAGS_PROFILE",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during PROFILE builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_EXE_LINKER_FLAGS_RELEASE",
@@ -454,6 +518,22 @@
 			"value" : "/machine:x64"
 		},
 		{
+			"name" : "CMAKE_MODULE_LINKER_FLAGS_CHECKED",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during the creation of modules during CHECKED builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS_DEBUG",
 			"properties" : 
 			[
@@ -484,6 +564,22 @@
 			],
 			"type" : "STRING",
 			"value" : "/INCREMENTAL:NO"
+		},
+		{
+			"name" : "CMAKE_MODULE_LINKER_FLAGS_PROFILE",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during the creation of modules during PROFILE builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS_RELEASE",
@@ -650,6 +746,22 @@
 			"value" : "-DWIN32"
 		},
 		{
+			"name" : "CMAKE_RC_FLAGS_CHECKED",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags for Windows Resource Compiler during CHECKED builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
 			"name" : "CMAKE_RC_FLAGS_DEBUG",
 			"properties" : 
 			[
@@ -676,6 +788,22 @@
 				{
 					"name" : "HELPSTRING",
 					"value" : "Flags for Windows Resource Compiler during MINSIZEREL builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
+			"name" : "CMAKE_RC_FLAGS_PROFILE",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags for Windows Resource Compiler during PROFILE builds."
 				}
 			],
 			"type" : "STRING",
@@ -742,6 +870,22 @@
 			"value" : "/machine:x64"
 		},
 		{
+			"name" : "CMAKE_SHARED_LINKER_FLAGS_CHECKED",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during the creation of shared libraries during CHECKED builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS_DEBUG",
 			"properties" : 
 			[
@@ -772,6 +916,22 @@
 			],
 			"type" : "STRING",
 			"value" : "/INCREMENTAL:NO"
+		},
+		{
+			"name" : "CMAKE_SHARED_LINKER_FLAGS_PROFILE",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during the creation of shared libraries during PROFILE builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS_RELEASE",
@@ -854,6 +1014,22 @@
 			"value" : "/machine:x64"
 		},
 		{
+			"name" : "CMAKE_STATIC_LINKER_FLAGS_CHECKED",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during the creation of static libraries during CHECKED builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
 			"name" : "CMAKE_STATIC_LINKER_FLAGS_DEBUG",
 			"properties" : 
 			[
@@ -880,6 +1056,22 @@
 				{
 					"name" : "HELPSTRING",
 					"value" : "Flags used by the linker during the creation of static libraries during MINSIZEREL builds."
+				}
+			],
+			"type" : "STRING",
+			"value" : ""
+		},
+		{
+			"name" : "CMAKE_STATIC_LINKER_FLAGS_PROFILE",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Flags used by the linker during the creation of static libraries during PROFILE builds."
 				}
 			],
 			"type" : "STRING",

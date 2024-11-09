@@ -55,7 +55,8 @@ void generators::tornado_generator::apply_to_particles(
             types::v3_f32 outwards_displacement = local_position - types::v3_f32::project(local_position, this->column_direction);
 
             types::f32 distance_sqr = outwards_displacement.magnitude_sqr();
-            if (distance_sqr > this->radius * this->radius)
+            types::f32 altitude = types::v3_f32::dot(local_position, this->column_direction);
+            if (distance_sqr > this->radius * this->radius || altitude > this->height)
                 return;
 
             types::v3_f32 tangent_force = 

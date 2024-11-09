@@ -23,6 +23,7 @@
 #include "systems/force_composer.hpp"
 #include "generators/gravity_generator.hpp"
 #include "generators/wind_generator.hpp"
+#include "generators/explosion_generator.hpp"
 
 std::string display_text = "This is a test";
 
@@ -46,18 +47,16 @@ ContactReportCallback gContactReportCallback;
 
 systems::particle_system particle_system = systems::particle_system(
 	systems::particle_generator(
-		systems::particle_generator::UNIFORM,
-		systems::particle_generator::CONE,
+		systems::particle_generator::NORMAL,
+		systems::particle_generator::BOX,
 		systems::particle_generator::generation_volume(
-			systems::generation_cone{ 
-				types::v3_f32(0.0f, 10.0f, 0.0f),
-				types::v3_f32(0.0f, 0.0f, 0.0f),
-			 	1.0f,
-				1.0f
+			systems::generation_box{ 
+				types::v3_f32{0.0f, 0.0f, 0.0f},
+				types::v3_f32{8.0f, 8.0f, 8.0f}
 			}
 		)
 	),
-	5.0f * 1000.0f
+	10.0f * 1000.0f
 );
 
 generators::wind_generator wind_generator = generators::wind_generator(
@@ -77,19 +76,29 @@ generators::tornado_generator tornado_generator = generators::tornado_generator(
 	types::v3_f32(0.0f, -5.0f, 0.0f),
 	types::v3_f32(0.0f, 1.0f, 0.0f),
 	100.0f,
-	25.0f,
+	250.0f,
 	1500.0f	
 );
+
+generators::explosion_generator explosion_generator = generators::explosion_generator(
+	types::v3_f32(0.0f, 0.0f, 0.0f),
+	150000.0f,
+	50.0f,
+	4.0f
+);
+bool in_explosion_time = false;
 
 struct combined_generator {
 	generators::gravity_generator gravity_generator;
 	generators::wind_generator wind_generator;
 	generators::tornado_generator tornado_generator;
+	generators::explosion_generator explosion_generator;
 
 	void apply_to_particles(systems::particle_system &particle_system, objects::seconds_f64 delta_time) {
 		gravity_generator.apply_to_particles(particle_system, delta_time);
-		//wind_generator.apply_to_particles(particle_system, delta_time);
+		wind_generator.apply_to_particles(particle_system, delta_time);
 		tornado_generator.apply_to_particles(particle_system, delta_time);
+		explosion_generator.apply_to_particles(particle_system, delta_time);
 	}
 };
 
@@ -261,15 +270,17 @@ void initPhysics(bool interactive)
 		float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
 		objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
 
+		types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
 		size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
-			[mass](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+			[mass, &particle_position](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+				particle_position = position;
 				return objects::mass_particle(objects::particle{position, velocity * 8.0f}, mass);
 			}, 0.5f, 1.0f
 		);
 
 		PxTransform &particle_transform = std::get<PxTransform &>(particle_system.set<PxTransform>(
 			particle_id,
-			PxTransform(v3_f32(0.0f, 0.0f, 0.0f))
+			PxTransform(particle_position)
 		));
 
 		types::v3_f32 low_mass_colour = { 0.15f, 0.05f, 0.95f };
@@ -314,15 +325,18 @@ void stepPhysics(bool interactive, double t)
 		}
 	}
 
-	auto force_composer = systems::force_composer<combined_generator>(combined_generator{
-		gravity_generator,
-		wind_generator,
-		tornado_generator
-	});
+	if (in_explosion_time) {
+		auto force_composer = systems::force_composer<combined_generator>(combined_generator{
+			gravity_generator,
+			wind_generator,
+			tornado_generator,
+			explosion_generator
+		});
 
-	// update
-	force_composer.apply_to_particles(particle_system, t);
-	force_composer.compose_forces(particle_system, t);
+		//update
+		force_composer.apply_to_particles(particle_system, t);
+		force_composer.compose_forces(particle_system, t);
+	}
 
 	// particle_system.iter<
 	// 	objects::particle::deconstruct_position,
@@ -418,6 +432,10 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'P':
 	{
 		instantiate_projectile(camera, projectile_type::PINEAPPLE);
+		break;
+	}
+	case 'E': {
+		in_explosion_time = !in_explosion_time;
 		break;
 	}
 	default:
