@@ -97,10 +97,10 @@ generators::dynamic_spring_force_generator dynamic_spring_force_generator =
 
 types::f32 buoyancy_gravity = 9.8f;
 generators::buoyancy_generator buoyancy_generator = generators::buoyancy_generator(
-	objects::position3_f32(0.0f, 0.0f, 0.0f),
-	types::v3_f32(0.0f, 2.0f, 0.0f),
-	1.0f,
-	buoyancy_gravity
+	objects::position3_f32(0.0f, -15.0f, 0.0f),
+	types::v3_f32(0.0f, 15.0f, 0.0f),
+	1000.0f,
+	1.0f
 );
 
 struct combined_generator {
@@ -300,7 +300,7 @@ void initPhysics(bool interactive)
 		size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
 			[mass, &particle_position](objects::position3_f32 position, objects::velocity3_f32 velocity) {
 				particle_position = position;
-				return objects::mass_particle(objects::particle{position, velocity * 8.0f}, mass);
+				return objects::mass_particle(objects::particle{position, {0.0f, 0.0f, 0.0f}}, mass);
 			}, 0.5f, 1.0f
 		);
 

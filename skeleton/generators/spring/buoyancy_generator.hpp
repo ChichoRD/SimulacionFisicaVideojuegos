@@ -10,14 +10,14 @@ namespace generators {
         objects::position3_f32 base_point;
         types::v3_f32 liquid_height;
 
+        types::f32 liquid_volume;
         types::f32 liquid_density;
-        types::f32 const &gravity;
 
         buoyancy_generator(
             objects::position3_f32 base_point,
             types::v3_f32 liquid_height,
-            types::f32 liquid_density,
-            types::f32 const &gravity
+            types::f32 liquid_volume,
+            types::f32 liquid_density
         );
 
         void apply_to_particles(
@@ -29,8 +29,8 @@ namespace generators {
             objects::position3_f32 const &particle_position,
             objects::position3_f32 const &base_point,
             types::v3_f32 const &liquid_height,
-            types::f32 liquid_density,
-            types::f32 gravity
+            types::f32 liquid_volume,
+            types::f32 liquid_density
         );
     };
 }
