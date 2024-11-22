@@ -21,6 +21,7 @@ void generators::buoyancy_generator::apply_to_particles(
             objects::generators::particle_force &force) {
             types::v3_f32 f = buoyancy_force(
                 position,
+                2.0f,
                 this->base_point,
                 this->liquid_height,
                 this->liquid_volume,
@@ -33,6 +34,7 @@ void generators::buoyancy_generator::apply_to_particles(
 
 types::v3_f32 generators::buoyancy_generator::buoyancy_force(
     objects::position3_f32 const &particle_position,
+    types::f32 particle_radius,
     objects::position3_f32 const &base_point,
     types::v3_f32 const &liquid_height,
     types::f32 liquid_volume,
@@ -40,13 +42,15 @@ types::v3_f32 generators::buoyancy_generator::buoyancy_force(
 ) {
     types::v3_f32 local_position = types::v3_f32{particle_position} - base_point;
     types::f32 height = liquid_height.magnitude();
+    types::f32 local_height = types::v3_f32::dot(local_position, liquid_height) / height;
 
-    types::f32 local_height = types::v3_f32::project(local_position, liquid_height).magnitude();
     types::f32 submersion = 0.0f;
-    if (local_height > height * 0.5f) {
+    if (local_height - particle_radius > height) {
         submersion = 0.0f;
+    } else if (local_height + particle_radius < height) {
+        submersion = 1.0f;
     } else {
-        submersion = local_height / height + 0.5f;
+        submersion = (height - local_height + particle_radius) / (2.0f * particle_radius);
     }
 
     return liquid_density * liquid_volume * submersion * liquid_height.normalized();

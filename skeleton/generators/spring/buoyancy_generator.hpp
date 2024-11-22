@@ -27,6 +27,7 @@ namespace generators {
 
         static types::v3_f32 buoyancy_force(
             objects::position3_f32 const &particle_position,
+            types::f32 particle_radius,
             objects::position3_f32 const &base_point,
             types::v3_f32 const &liquid_height,
             types::f32 liquid_volume,
