@@ -367,6 +367,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\wind_generator.hpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\explosion_generator.cpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\explosion_generator.hpp" />
+    <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\spring\spring_force_generator.cpp" />
+    <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\spring\spring_force_generator.hpp" />
+    <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\spring\buoyancy_generator.cpp" />
+    <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\generators\spring\buoyancy_generator.hpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\particle_defs.hpp" />
     <ClCompile Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.cpp" />
     <ClInclude Include="D:\chich\Projects\UCM\SIM\SimulacionFisicaVideojuegos\skeleton\types\v3_f32.hpp" />

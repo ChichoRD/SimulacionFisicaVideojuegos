@@ -24,6 +24,8 @@
 #include "generators/gravity_generator.hpp"
 #include "generators/wind_generator.hpp"
 #include "generators/explosion_generator.hpp"
+#include "generators/spring/spring_force_generator.hpp"
+#include "generators/spring/buoyancy_generator.hpp"
 
 std::string display_text = "This is a test";
 
@@ -82,11 +84,24 @@ generators::tornado_generator tornado_generator = generators::tornado_generator(
 
 generators::explosion_generator explosion_generator = generators::explosion_generator(
 	types::v3_f32(0.0f, 0.0f, 0.0f),
-	150000.0f,
+	15000.0f,
 	50.0f,
 	4.0f
 );
 bool in_explosion_time = false;
+
+generators::static_spring_force_generator static_spring_force_generator =
+	generators::static_spring_force_generator(100.0f);
+generators::dynamic_spring_force_generator dynamic_spring_force_generator =
+	generators::dynamic_spring_force_generator(100.0f);
+
+types::f32 buoyancy_gravity = 9.8f;
+generators::buoyancy_generator buoyancy_generator = generators::buoyancy_generator(
+	objects::position3_f32(0.0f, 0.0f, 0.0f),
+	types::v3_f32(0.0f, 2.0f, 0.0f),
+	1.0f,
+	buoyancy_gravity
+);
 
 struct combined_generator {
 	generators::gravity_generator gravity_generator;
@@ -94,11 +109,19 @@ struct combined_generator {
 	generators::tornado_generator tornado_generator;
 	generators::explosion_generator explosion_generator;
 
+	generators::static_spring_force_generator static_spring_force_generator;
+	generators::dynamic_spring_force_generator dynamic_spring_force_generator;
+	generators::buoyancy_generator buoyancy_generator;
+
 	void apply_to_particles(systems::particle_system &particle_system, objects::seconds_f64 delta_time) {
 		gravity_generator.apply_to_particles(particle_system, delta_time);
-		wind_generator.apply_to_particles(particle_system, delta_time);
-		tornado_generator.apply_to_particles(particle_system, delta_time);
-		explosion_generator.apply_to_particles(particle_system, delta_time);
+		// wind_generator.apply_to_particles(particle_system, delta_time);
+		// tornado_generator.apply_to_particles(particle_system, delta_time);
+		// explosion_generator.apply_to_particles(particle_system, delta_time);
+
+		// static_spring_force_generator.apply_to_particles(particle_system, delta_time);
+		// dynamic_spring_force_generator.apply_to_particles(particle_system, delta_time);
+		buoyancy_generator.apply_to_particles(particle_system, delta_time);
 	}
 };
 
@@ -258,7 +281,10 @@ void initPhysics(bool interactive)
 	positive_x_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_x_transform, color_x);
 	positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
 	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
-
+	
+	// PxBoxGeometry
+	// PxTriangleMeshGeometry(PxTriangleMesh)
+	// //RenderItem(CreateShape(Px()))
 	RegisterRenderItem(origin_render_item);
 	RegisterRenderItem(positive_x_render_item);
 	RegisterRenderItem(positive_y_render_item);
@@ -284,7 +310,7 @@ void initPhysics(bool interactive)
 		));
 
 		types::v3_f32 low_mass_colour = { 0.15f, 0.05f, 0.95f };
-		types::v3_f32 high_mass_colour = { 0.95f, 0.15f, 0.05f };
+		types::v3_f32 high_mass_colour = { 0.95f, 0.15f, 0.35f };
 		types::v3_f32 colour = types::v3_f32::lerp(low_mass_colour, high_mass_colour, normalized_mass);
 		particle_system.set<RenderItem *>(
 			particle_id,
@@ -295,6 +321,10 @@ void initPhysics(bool interactive)
 				1.0f
 			})
 		);
+
+		static_spring_force_generator.add_anchor<8>(particle_system, particle_id, objects::position3_f32{
+			0.0f, 100.0f, 1.0f
+		});
 	}
 
 	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
@@ -330,7 +360,10 @@ void stepPhysics(bool interactive, double t)
 			gravity_generator,
 			wind_generator,
 			tornado_generator,
-			explosion_generator
+			explosion_generator,
+			static_spring_force_generator,
+			dynamic_spring_force_generator,
+			buoyancy_generator
 		});
 
 		//update

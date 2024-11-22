@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gameDEBUG.exe"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gameCHECKED.exe"
 		},
 		{
-			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gameDEBUG.pdb"
+			"path" : "D:/chich/Projects/UCM/SIM/SimulacionFisicaVideojuegos/bin/gameCHECKED.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -33,43 +33,43 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 176,
+				"line" : 180,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 327,
+				"line" : 331,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 436,
+				"line" : 440,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 434,
+				"line" : 438,
 				"parent" : 0
 			},
 			{
 				"command" : 4,
 				"file" : 0,
-				"line" : 289,
+				"line" : 293,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 251,
+				"line" : 255,
 				"parent" : 0
 			},
 			{
 				"command" : 6,
 				"file" : 0,
-				"line" : 236,
+				"line" : 240,
 				"parent" : 0
 			}
 		]
@@ -80,15 +80,11 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-MTd"
+					"fragment" : "-MT"
 				},
 				{
 					"backtrace" : 5,
-					"fragment" : "/Od"
-				},
-				{
-					"backtrace" : 5,
-					"fragment" : "/RTCu"
+					"fragment" : "/Ox"
 				},
 				{
 					"backtrace" : 5,
@@ -187,15 +183,15 @@
 			[
 				{
 					"backtrace" : 6,
+					"define" : "NDEBUG"
+				},
+				{
+					"backtrace" : 6,
 					"define" : "PHYSX_PROFILE_SDK"
 				},
 				{
 					"backtrace" : 6,
 					"define" : "PX_CHECKED=1"
-				},
-				{
-					"backtrace" : 6,
-					"define" : "PX_DEBUG=1"
 				},
 				{
 					"backtrace" : 6,
@@ -224,10 +220,6 @@
 				{
 					"backtrace" : 6,
 					"define" : "_CRT_SECURE_NO_DEPRECATE"
-				},
-				{
-					"backtrace" : 6,
-					"define" : "_DEBUG"
 				},
 				{
 					"backtrace" : 6,
@@ -292,9 +284,11 @@
 				19,
 				21,
 				23,
-				26,
-				28,
-				30
+				25,
+				27,
+				30,
+				32,
+				34
 			]
 		}
 	],
@@ -310,11 +304,71 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-MTd",
+				"fragment" : "-MT",
 				"role" : "flags"
 			},
 			{
 				"fragment" : "/subsystem:console",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "/LIBPATH:../../../Lib/vc14win64",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PhysX3CommonCHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PhysX3CHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PhysX3CookingCHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PhysX3CharacterKinematicCHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PhysX3ExtensionsCHECKED.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PxTaskCHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PxFoundationCHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PsFastXmlCHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "PxPvdSDKCHECKED_x64.lib",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "/LIBPATH:../../lib/vc14win64",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "UtilsCHECKED.lib",
 				"role" : "flags"
 			},
 			{
@@ -374,52 +428,52 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CommonDEBUG_x64.lib",
+				"fragment" : "PhysX3CommonCHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3DEBUG_x64.lib",
+				"fragment" : "PhysX3CHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CookingDEBUG_x64.lib",
+				"fragment" : "PhysX3CookingCHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3CharacterKinematicDEBUG_x64.lib",
+				"fragment" : "PhysX3CharacterKinematicCHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PhysX3ExtensionsDEBUG.lib",
+				"fragment" : "PhysX3ExtensionsCHECKED.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxTaskDEBUG_x64.lib",
+				"fragment" : "PxTaskCHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxFoundationDEBUG_x64.lib",
+				"fragment" : "PxFoundationCHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PsFastXmlDEBUG_x64.lib",
+				"fragment" : "PsFastXmlCHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "PxPvdSDKDEBUG_x64.lib",
+				"fragment" : "PxPvdSDKCHECKED_x64.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "UtilsDEBUG.lib",
+				"fragment" : "UtilsCHECKED.lib",
 				"role" : "libraries"
 			},
 			{
@@ -445,7 +499,7 @@
 		"language" : "CXX"
 	},
 	"name" : "game",
-	"nameOnDisk" : "gameDEBUG.exe",
+	"nameOnDisk" : "gameCHECKED.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -484,17 +538,21 @@
 				24,
 				25,
 				26,
-				27
+				27,
+				28,
+				29,
+				30,
+				31
 			]
 		},
 		{
 			"name" : "Render",
 			"sourceIndexes" : 
 			[
-				28,
-				29,
-				30,
-				31
+				32,
+				33,
+				34,
+				35
 			]
 		}
 	],
@@ -635,6 +693,28 @@
 		{
 			"backtrace" : 1,
 			"path" : "generators/explosion_generator.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "generators/spring/spring_force_generator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "generators/spring/spring_force_generator.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "generators/spring/buoyancy_generator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "generators/spring/buoyancy_generator.hpp",
 			"sourceGroupIndex" : 0
 		},
 		{

@@ -33,43 +33,43 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 176,
+				"line" : 180,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 327,
+				"line" : 331,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 436,
+				"line" : 440,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 434,
+				"line" : 438,
 				"parent" : 0
 			},
 			{
 				"command" : 4,
 				"file" : 0,
-				"line" : 289,
+				"line" : 293,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 251,
+				"line" : 255,
 				"parent" : 0
 			},
 			{
 				"command" : 6,
 				"file" : 0,
-				"line" : 236,
+				"line" : 240,
 				"parent" : 0
 			}
 		]
@@ -284,9 +284,11 @@
 				19,
 				21,
 				23,
-				26,
-				28,
-				30
+				25,
+				27,
+				30,
+				32,
+				34
 			]
 		}
 	],
@@ -541,17 +543,21 @@
 				24,
 				25,
 				26,
-				27
+				27,
+				28,
+				29,
+				30,
+				31
 			]
 		},
 		{
 			"name" : "Render",
 			"sourceIndexes" : 
 			[
-				28,
-				29,
-				30,
-				31
+				32,
+				33,
+				34,
+				35
 			]
 		}
 	],
@@ -692,6 +698,28 @@
 		{
 			"backtrace" : 1,
 			"path" : "generators/explosion_generator.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "generators/spring/spring_force_generator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "generators/spring/spring_force_generator.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "generators/spring/buoyancy_generator.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "generators/spring/buoyancy_generator.hpp",
 			"sourceGroupIndex" : 0
 		},
 		{

@@ -38,6 +38,7 @@ namespace systems {
 
 	public:
 		attribute_storage();
+		attribute_storage(attribute_storage const &other);
 		attribute_storage(size_t particle_capacity, storage_type storage_type, size_t type_size);
 
 		attribute_storage(attribute_storage &&other);

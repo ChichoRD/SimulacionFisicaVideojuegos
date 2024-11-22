@@ -3,6 +3,12 @@ namespace systems {
     attribute_storage::attribute_storage()
 		: type_size(), mask(), data(), storage_variant(storage_type::UNIT) { }
 
+    attribute_storage::attribute_storage(attribute_storage const &other)
+		: type_size(other.type_size),
+		mask(other.mask),
+		data(other.data),
+		storage_variant(other.storage_variant) { }
+
     attribute_storage::attribute_storage(
 		size_t particle_capacity,
 		storage_type storage_type,
