@@ -201,7 +201,7 @@ namespace systems {
 				return particles.at(attribute_id).set_particle_attribute(particle, attribute);
 			} else {
 				attribute_map.insert({ typeid(T), attribute_id });
-				std::cout << "setting attribute: " << typeid(T).name() << std::endl;
+				//std::cout << "setting attribute: " << typeid(T).name() << std::endl;
 				particles.emplace_back(attribute_storage::create_vector_storage<T>(particle_count()));
 				return particles.at(attribute_id).set_particle_attribute(particle, attribute);
 			}

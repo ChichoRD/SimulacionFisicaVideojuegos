@@ -4,6 +4,8 @@
 
 #include "core.hpp"
 #include "RenderUtils.hpp"
+#include <iostream>
+#include <cassert>
 
 
 using namespace physx;
@@ -110,8 +112,9 @@ void renderCallback()
 				renderShape(*obj->shape, actor->getGlobalPose(), obj->color);
 				continue;
 			}
+		} else {
+			renderShape(*obj->shape, objTransform ? *objTransform : physx::PxTransform(PxIdentity), obj->color);
 		}
-		renderShape(*obj->shape, objTransform ? *objTransform : physx::PxTransform(PxIdentity), obj->color);
 	}
 
 	//PxScene* scene;

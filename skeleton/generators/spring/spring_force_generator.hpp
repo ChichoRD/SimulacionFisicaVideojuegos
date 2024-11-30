@@ -42,6 +42,8 @@ namespace generators {
                     anchors.anchors[anchors.anchor_count] = {anchor, rest_distance};
                     anchors.anchor_count++;
                     return anchors.anchor_count - 1;
+                } else {
+                    return (size_t)-1;
                 }
             } else {
                 auto &anchors = particle_system.particles.set_particle_attribute<static_spring_anchors<MaxAnchors>>(

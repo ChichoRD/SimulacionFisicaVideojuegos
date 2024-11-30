@@ -99,7 +99,7 @@ namespace systems {
 
     public:
         inline bool active(std::time_t current_time) const {
-            return current_time - start_time <= lifetime_milliseconds;
+            return current_time - start_time <= (std::time_t)lifetime_milliseconds;
         }
         inline particle_count_t alive_particle_count() const {
             return particles.particle_count() - dead_particles.size();

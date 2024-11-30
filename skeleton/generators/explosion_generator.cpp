@@ -1,3 +1,4 @@
+#include <cassert>
 #include "explosion_generator.hpp"
 
 generators::explosion_generator::explosion_generator(
@@ -47,16 +48,31 @@ void generators::explosion_generator::apply_to_particles(
         [this](generators::explosion_generator::explosion_seconds_f64 const &explosion_time,
             objects::particle::deconstruct_position const &position,
             objects::generators::particle_force &force) {
+            // assert(
+            //     !std::isnan(force.x)
+            //     && !std::isnan(force.y)
+            //     && !std::isnan(force.z)
+            //     && "error: force is NaN"
+            // );
+
             types::v3_f32 local_position = types::v3_f32{position} - this->explosion_centre;
             types::f32 distance_sqr = local_position.magnitude_sqr();
             if (distance_sqr > this->radius_sqr)
                 return;
 
-            types::v3_f32 explosion_force =
-                (K / distance_sqr)
-                * local_position.normalized()
-                * std::expf(-explosion_time.value / this->fade_time_constant);
-            force += explosion_force;
+            if (distance_sqr > 0.001f) {
+                types::v3_f32 explosion_force =
+                    (K / distance_sqr)
+                    * local_position.normalized()
+                    * std::expf(-explosion_time.value / this->fade_time_constant);
+                force += explosion_force;
+            }
+            // assert(
+            //     !std::isnan(force.x)
+            //     && !std::isnan(force.y)
+            //     && !std::isnan(force.z)
+            //     && "error: force is NaN"
+            // );
         }
     );
 }
