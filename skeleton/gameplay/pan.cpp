@@ -12,13 +12,12 @@ objects::solid_dynamic_multishape_particle pan::create_pan(physx::PxPhysics & ph
     std::vector<physx::PxVec3> mass_space_inertia_tensors;
 
     physx::PxMaterial *material = physics.createMaterial(0.5f, 0.5f, 0.6f);
-    // HACK: testing values
-    types::v3_f32 local_attachment_point = {20.0f, 0.0f, -pan::pan_length_unit * 0.25f};
+    types::v3_f32 local_attachment_point = {0.0f, 0.0f, -pan::pan_length_unit * 0.75f};
 
-    types::v3_f32 handle_color = {0.5f, 0.5f, 0.5f};
+    types::v3_f32 handle_color = {0.25f, 0.25f, 0.25f};
     types::f32 handle_mass = 1.0f;
     for (size_t i = 0; i < pan::pan_handle_straight_pieces_count; ++i) {
-        auto handle_box = new physx::PxBoxGeometry(pan::straight_piece_size);
+        auto handle_box = new physx::PxBoxGeometry(pan::straight_piece_size + types::v3_f32{0.0f, 0.0f, pan::straight_piece_size.z});
         geometries.push_back(handle_box);
 
         auto handle_local_pose = new physx::PxTransform(local_attachment_point);
@@ -29,7 +28,8 @@ objects::solid_dynamic_multishape_particle pan::create_pan(physx::PxPhysics & ph
             *handle_box, handle_mass
         ));
 
-        local_attachment_point.z += pan::straight_piece_size.z;
+        local_attachment_point.z += pan::straight_piece_size.z * 4.0f;
+        local_attachment_point.y -= pan::straight_piece_size.y;
     }
 
     physx::PxVec3 initial_direction = {0.0f, 0.0f, 1.0f};
@@ -38,7 +38,7 @@ objects::solid_dynamic_multishape_particle pan::create_pan(physx::PxPhysics & ph
     types::f32 angle = std::acos(dot);
     physx::PxVec3 axis = initial_direction.cross(rotated_direction).getNormalized();
 
-    physx::PxQuat rotation_quaternion = physx::PxQuat(angle, physx::PxVec3(axis.x, axis.y, axis.z));
+    physx::PxQuat rotation_quaternion = physx::PxQuat(angle, axis);
     for (size_t i = 0; i < pan::pan_handle_diagonal_pieces_count; ++i) {
         auto handle_box = new physx::PxBoxGeometry(pan::pan_handle_diagonal_piece_size);
         geometries.push_back(handle_box);
@@ -53,7 +53,7 @@ objects::solid_dynamic_multishape_particle pan::create_pan(physx::PxPhysics & ph
         mass_space_inertia_tensors.push_back(objects::box_mass_space_inertia_tensor(
             *handle_box, handle_mass
         ));
-
+        
         local_attachment_point.z += rotation_quaternion.rotate({0.0f, 0.0f, pan::pan_handle_diagonal_piece_size.z}).z;
     }
 

@@ -458,6 +458,10 @@ void stepPhysics(bool interactive, double t)
 		}
 	);
 
+	auto &frying_pan_rb = g_world->frying_pan.pan_solid.rigid_dynamic;
+	frying_pan_rb->setKinematicTarget(PxTransform(
+		frying_pan_rb->getGlobalPose().p + PxVec3(0.0f, 0.0f, 1.0f) * t
+	));
 	gScene->simulate(t);
 	PxU32 errorState = 0;
 	gScene->fetchResults(true, &errorState);

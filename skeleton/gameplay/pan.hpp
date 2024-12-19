@@ -19,7 +19,7 @@ private:
     constexpr static types::v3_f32 straight_piece_size = {pan_length_unit, pan_length_unit, pan_length_unit * 2.5f};
     constexpr static types::v3_f32 pan_handle_remaining_displacement =
         pan_handle_displacement
-        - straight_piece_size * pan_handle_straight_pieces_count;
+        - types::v3_f32{0.0f, 0.0f, straight_piece_size.z} * pan_handle_straight_pieces_count;
     constexpr static types::v3_f32 pan_handle_diagonal_piece_size = {pan_length_unit, pan_length_unit, pan_handle_remaining_displacement.z / pan_handle_diagonal_pieces_count};
 
     constexpr static types::v3_f32 pan_base_size = {pan_length_unit * 8.0f, pan_length_unit, pan_length_unit * 8.0f};
