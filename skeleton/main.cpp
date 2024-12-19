@@ -448,43 +448,55 @@ void cleanupPhysics(bool interactive)
 void keyPress(unsigned char key, const PxTransform& camera)
 {
 	PX_UNUSED(camera);
-	// TODO: pass to game
+	game->on_key_press(key, camera);
 
-	switch(toupper(key))
-	{
-	case 'B':
-	{
-		instantiate_projectile(camera, projectile_type::BULLET);
-		break;
-	}
-	case 'F':
-	{
-		instantiate_projectile(camera, projectile_type::FIRE_BALL);
-		break;
-	}
-	case 'G':
-	{
-		instantiate_projectile(camera, projectile_type::GAMING_MOUSE);
-		break;
-	}
-	case 'P':
-	{
-		instantiate_projectile(camera, projectile_type::PINEAPPLE);
-		break;
-	}
-	case 'E': {
-		in_explosion_time = !in_explosion_time;
-		break;
-	}
-	default:
-		break;
-	}
+	// switch(toupper(key))
+	// {
+	// case 'B':
+	// {
+	// 	instantiate_projectile(camera, projectile_type::BULLET);
+	// 	break;
+	// }
+	// case 'F':
+	// {
+	// 	instantiate_projectile(camera, projectile_type::FIRE_BALL);
+	// 	break;
+	// }
+	// case 'G':
+	// {
+	// 	instantiate_projectile(camera, projectile_type::GAMING_MOUSE);
+	// 	break;
+	// }
+	// case 'P':
+	// {
+	// 	instantiate_projectile(camera, projectile_type::PINEAPPLE);
+	// 	break;
+	// }
+	// case 'E': {
+	// 	in_explosion_time = !in_explosion_time;
+	// 	break;
+	// }
+	// default:
+	// 	break;
+	// }
+}
+
+void keyboard_up_callback(unsigned char key, int x, int y)
+{
+	PX_UNUSED(x);
+	PX_UNUSED(y);
+	game->on_key_release(key);
 }
 
 void onCollision(physx::PxActor* actor1, physx::PxActor* actor2)
 {
 	PX_UNUSED(actor1);
 	PX_UNUSED(actor2);
+}
+
+void passive_motion_callback(int x, int y)
+{
+	game->on_passive_mouse_motion(x, y);
 }
 
 

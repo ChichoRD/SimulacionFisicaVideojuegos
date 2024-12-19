@@ -10,8 +10,13 @@ struct cookable {
     objects::seconds_f64 cook_time;
     objects::solid_dynamic_multishape_particle solid;
 
+    objects::seconds_f64 current_cook_time;
+    objects::seconds_f64 previous_cook_time;
+
     cookable() = default;
     cookable(objects::seconds_f64 cook_time, objects::solid_dynamic_multishape_particle &&solid);
+
+    objects::seconds_f64 cook(objects::seconds_f64 delta_time);
 
     static cookable create_egg(
         physx::PxPhysics &physics,

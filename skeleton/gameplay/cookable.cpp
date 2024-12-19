@@ -1,7 +1,13 @@
 #include "cookable.hpp"
 
 cookable::cookable(objects::seconds_f64 cook_time, objects::solid_dynamic_multishape_particle &&solid)
-    : cook_time(cook_time), solid(std::move(solid)) {
+    : cook_time(cook_time), solid(std::move(solid)), current_cook_time(0.0), previous_cook_time(0.0) {
+}
+
+objects::seconds_f64 cookable::cook(objects::seconds_f64 delta_time) {
+    previous_cook_time = current_cook_time;
+    current_cook_time += delta_time;
+    return current_cook_time;
 }
 
 cookable cookable::create_egg(

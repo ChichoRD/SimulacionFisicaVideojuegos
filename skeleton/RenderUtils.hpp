@@ -4,6 +4,9 @@
 #include "PxPhysicsAPI.h"
 #include "core.hpp"
 
+extern void passive_motion_callback(int x, int y);
+extern void keyboard_up_callback(unsigned char key, int x, int y);
+
 class RenderItem;
 void RegisterRenderItem(const RenderItem* _item);
 void DeregisterRenderItem(const RenderItem* _item);

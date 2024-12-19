@@ -140,7 +140,9 @@ void exitCallback(void)
 void renderLoop()
 {
 	StartCounter();
-	sCamera = new Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f,-0.2f,-0.7f));
+	auto position = PxVec3(0.0f, 35.0f, -15.0f);
+	auto target = PxVec3(0.0f, 5.0f, 10.0f);
+	sCamera = new Camera(position, target - position);
 
 	setupDefaultWindow("Simulacion Fisica Videojuegos");
 	setupDefaultRenderState();
@@ -148,8 +150,11 @@ void renderLoop()
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
 	glutKeyboardFunc(keyboardCallback);
+	glutKeyboardUpFunc(keyboard_up_callback);
 	glutMouseFunc(mouseCallback);
-	glutMotionFunc(motionCallback);
+	//glutMotionFunc(motionCallback);
+
+	glutPassiveMotionFunc(passive_motion_callback);
 	motionCallback(0,0);
 
 	atexit(exitCallback);
