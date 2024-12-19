@@ -16,6 +16,21 @@ struct cookable {
     static cookable create_egg(
         physx::PxPhysics &physics,
         physx::PxTransform const &transform,
+        physx::PxBoxGeometry const &scale_bounds,
+        objects::seconds_f64 cook_time
+    );
+
+    static cookable create_steak(
+        physx::PxPhysics &physics,
+        physx::PxTransform const &transform,
+        physx::PxBoxGeometry const &scale_bounds,
+        objects::seconds_f64 cook_time
+    );
+
+    static cookable create_fries(
+        physx::PxPhysics &physics,
+        physx::PxTransform const &transform,
+        physx::PxBoxGeometry const &scale_bounds,
         objects::seconds_f64 cook_time
     );
 };

@@ -8,6 +8,7 @@
 #include "../callbacks.hpp"
 
 #include "pan.hpp"
+#include "cookable.hpp"
 
 extern ContactReportCallback gContactReportCallback;
 extern physx::PxDefaultCpuDispatcher* gDispatcher;
@@ -19,6 +20,9 @@ struct game_scene : public physx::PxSimulationEventCallback {
 
     objects::solid_static_particle ground;
     pan frying_pan;
+    cookable egg;
+    cookable steak;
+    cookable fries;
 
     game_scene(physx::PxPhysics &physics);
     ~game_scene();

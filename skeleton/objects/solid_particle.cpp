@@ -161,3 +161,22 @@ physx::PxVec3 objects::hollow_tube_mass_space_inertia_tensor(
         symmetric_part
     );
 }
+
+objects::solid_dynamic_multishape_particle::builder::~builder() {
+    for (physx::PxTransform const *local_pose : local_poses) {
+        delete local_pose;
+    }
+    for (physx::PxGeometry const *geometry : geometries) {
+        delete geometry;
+    }
+}
+
+objects::solid_dynamic_multishape_particle objects::solid_dynamic_multishape_particle::builder::build(
+    physx::PxPhysics &physics,
+    physx::PxTransform const &transform,
+    physx::PxMaterial const &material
+) {
+    return solid_dynamic_multishape_particle(
+        physics, transform, material, geometries, local_poses, colors, mass_space_inertia_tensors
+    );
+}

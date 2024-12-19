@@ -66,6 +66,39 @@ namespace objects {
     };
 
     struct solid_dynamic_multishape_particle {
+        struct builder {
+            std::vector<physx::PxGeometry const *> geometries;
+            std::vector<physx::PxTransform const *> local_poses;
+            std::vector<physx::PxVec4> colors;
+            std::vector<physx::PxVec3> mass_space_inertia_tensors;
+
+            builder() = default;
+            ~builder();
+
+            template <
+                typename Geometry,
+                typename = std::enable_if_t<std::is_base_of_v<physx::PxGeometry, Geometry>>
+            >
+            builder &add_shape(
+                Geometry const &geometry,
+                physx::PxTransform const &local_pose,
+                physx::PxVec4 const &color,
+                physx::PxVec3 const &mass_space_inertia_tensor
+            ) {
+                geometries.push_back(new Geometry(geometry));
+                local_poses.push_back(new physx::PxTransform(local_pose));
+                colors.push_back(color);
+                mass_space_inertia_tensors.push_back(mass_space_inertia_tensor);
+                return *this;
+            }
+
+            solid_dynamic_multishape_particle build(
+                physx::PxPhysics &physics,
+                physx::PxTransform const &transform,
+                physx::PxMaterial const &material
+            );
+        };
+
         physx::PxRigidDynamic *rigid_dynamic;
         std::vector<RenderItem *> render_items;
 

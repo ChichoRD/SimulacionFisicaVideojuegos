@@ -41,6 +41,31 @@ bool game_scene::init() {
 
     frying_pan = pan(physics, physx::PxTransform(physx::PxVec3(0.0f, 5.0f, 0.0f)));
     scene->addActor(*frying_pan.pan_solid.rigid_dynamic);
+
+    egg = cookable::create_egg(
+        physics,
+        physx::PxTransform(physx::PxVec3(0.0f, 10.0f, 0.0f)),
+        physx::PxBoxGeometry(2.0f, 2.0f, 2.0f),
+        10.0
+    );
+    scene->addActor(*egg.solid.rigid_dynamic);
+
+    steak = cookable::create_steak(
+        physics,
+        physx::PxTransform(physx::PxVec3(0.0f, 15.0f, 0.0f)),
+        physx::PxBoxGeometry(2.0f, 1.0f, 2.0f),
+        10.0
+    );
+    scene->addActor(*steak.solid.rigid_dynamic);
+
+    fries = cookable::create_fries(
+        physics,
+        physx::PxTransform(physx::PxVec3(0.0f, 20.0f, 0.0f)),
+        physx::PxBoxGeometry(3.0f, 1.0f, 1.0f),
+        10.0
+    );
+    scene->addActor(*fries.solid.rigid_dynamic);
+    
     return true;
 }
 
