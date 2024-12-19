@@ -1,3 +1,6 @@
+#ifndef PROJECTILE_HPP
+#define PROJECTILE_HPP
+
 #include "mass_particle.hpp"
 
 namespace objects {
@@ -25,3 +28,5 @@ namespace objects {
 		projectile& operator=(projectile const& other) noexcept = default;
 	};
 }
+
+#endif

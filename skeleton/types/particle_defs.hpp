@@ -1,3 +1,6 @@
+#ifndef PARTICLE_DEFS_HPP
+#define PARTICLE_DEFS_HPP
+
 #include <tuple>
 #include <type_traits>
 
@@ -27,3 +30,5 @@ namespace systems {
 		>;
 	};
 }
+
+#endif

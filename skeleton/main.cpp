@@ -26,6 +26,7 @@
 #include "generators/explosion_generator.hpp"
 #include "generators/spring/spring_force_generator.hpp"
 #include "generators/spring/buoyancy_generator.hpp"
+#include "objects/solid_particle.hpp"
 
 std::string display_text = "This is a test";
 
@@ -245,6 +246,27 @@ static projectile_index instantiate_projectile(PxTransform const& camera, projec
 	return register_projectile(p, color, size) - 1;
 }
 
+struct world {
+	RenderItem *ground_render_item;
+	RenderItem *cube0_render_item;
+	RenderItem *cube1_render_item;
+} *g_world = nullptr;
+
+bool init_sample_physics(PxScene *&out_scene, PxDefaultCpuDispatcher *&out_dispatcher) {
+	assert(gPhysics && "error: physics must be initialized before calling init_sample_physics");
+	
+	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+
+	out_dispatcher = PxDefaultCpuDispatcherCreate(2);
+	sceneDesc.cpuDispatcher = out_dispatcher;
+	sceneDesc.filterShader = contactReportFilterShader;
+	sceneDesc.simulationEventCallback = &gContactReportCallback;
+
+	out_scene = gPhysics->createScene(sceneDesc);
+	return true;
+}
+
 // Initialize physics engine
 void initPhysics(bool interactive)
 {
@@ -260,6 +282,36 @@ void initPhysics(bool interactive)
 
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
+	g_world = new world();
+	assert(init_sample_physics(gScene, gDispatcher) && "fatal error: failed to initialize sample physics");
+	PxRigidStatic* ground_plane = gPhysics->createRigidStatic(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+	PxShape* ground_shape = gPhysics->createShape(PxBoxGeometry(100.0f, 1.0f, 100.0f), *gMaterial);
+	ground_plane->attachShape(*ground_shape);
+	gScene->addActor(*ground_plane);
+
+	RenderItem *ground_render_item = new RenderItem(ground_shape, ground_plane, { 0.5f, 0.5f, 0.5f, 1.0f });
+	g_world->ground_render_item = ground_render_item;
+
+	PxRigidDynamic* cube0 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 100.0f, 0.0f)));
+	PxShape* cube0_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
+	cube0->attachShape(*cube0_shape);
+	// // TODO: inertia tensors
+	// cube0->setMassSpaceInertiaTensor({});
+	PxRigidBodyExt::updateMassAndInertia(*cube0, 1.0f);
+	gScene->addActor(*cube0);
+
+	RenderItem *cube0_render_item = new RenderItem(cube0_shape, cube0, { 0.5f, 0.5f, 0.5f, 1.0f });
+	g_world->cube0_render_item = cube0_render_item;
+
+	PxRigidDynamic* cube1 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 150.0f, 0.0f)));
+	PxShape* cube1_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
+	cube1->attachShape(*cube1_shape);
+	PxRigidBodyExt::updateMassAndInertia(*cube1, 4.0f);
+	gScene->addActor(*cube1);
+
+	RenderItem *cube1_render_item = new RenderItem(cube1_shape, cube1, { 0.5f, 0.5f, 0.5f, 1.0f });
+	g_world->cube1_render_item = cube1_render_item;
+	
 
 	// axis:
 	using namespace types;
@@ -332,15 +384,6 @@ void initPhysics(bool interactive)
 			particle_system.set<RenderItem *>(id, std::move(particle_render_item));
 		}
 	);
-
-	// For Solid Rigids +++++++++++++++++++++++++++++++++++++
-	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.8f, 0.0f);
-	gDispatcher = PxDefaultCpuDispatcherCreate(2);
-	sceneDesc.cpuDispatcher = gDispatcher;
-	sceneDesc.filterShader = contactReportFilterShader;
-	sceneDesc.simulationEventCallback = &gContactReportCallback;
-	gScene = gPhysics->createScene(sceneDesc);
 }
 
 
@@ -397,8 +440,11 @@ void stepPhysics(bool interactive, double t)
 		}
 	);
 
+	//std::cout << "cube0 y: " << g_world->cube0_render_item->transform->p.y << std::endl;
 	gScene->simulate(t);
-	gScene->fetchResults(true);
+	PxU32 errorState = 0;
+	gScene->fetchResults(true, &errorState);
+	assert(errorState == 0 && "error: physics simulation failed");
 }
 
 // Function to clean data
@@ -435,6 +481,15 @@ void cleanupPhysics(bool interactive)
 		particle_system.remove_particle(i);
 	}
 
+	DeregisterRenderItem(g_world->ground_render_item);
+	delete g_world->ground_render_item;
+	DeregisterRenderItem(g_world->cube0_render_item);
+	delete g_world->cube0_render_item;
+	DeregisterRenderItem(g_world->cube1_render_item);
+	delete g_world->cube1_render_item;
+
+	delete g_world;
+
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
 	gScene->release();
 	gDispatcher->release();
@@ -445,7 +500,7 @@ void cleanupPhysics(bool interactive)
 	transport->release();
 	
 	gFoundation->release();
-	}
+}
 
 // Function called when a key is pressed
 void keyPress(unsigned char key, const PxTransform& camera)
@@ -492,6 +547,7 @@ void onCollision(physx::PxActor* actor1, physx::PxActor* actor2)
 
 int main(int, const char*const*)
 {
+//#define OFFLINE_EXECUTION
 #ifndef OFFLINE_EXECUTION 
 	extern void renderLoop();
 	renderLoop();
