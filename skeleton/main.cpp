@@ -27,6 +27,7 @@
 #include "generators/spring/spring_force_generator.hpp"
 #include "generators/spring/buoyancy_generator.hpp"
 #include "objects/solid_particle.hpp"
+#include "gameplay/pan.hpp"
 
 std::string display_text = "This is a test";
 
@@ -247,6 +248,10 @@ static projectile_index instantiate_projectile(PxTransform const& camera, projec
 	return register_projectile(p, color, size) - 1;
 }
 
+struct world {
+	pan frying_pan;
+} *g_world;
+
 bool init_sample_physics(PxScene *&out_scene, PxDefaultCpuDispatcher *&out_dispatcher) {
 	assert(gPhysics && "error: physics must be initialized before calling init_sample_physics");
 	
@@ -262,72 +267,7 @@ bool init_sample_physics(PxScene *&out_scene, PxDefaultCpuDispatcher *&out_dispa
 	return true;
 }
 
-// Initialize physics engine
-void initPhysics(bool interactive)
-{
-	PX_UNUSED(interactive);
-
-	gFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator, gErrorCallback);
-
-	gPvd = PxCreatePvd(*gFoundation);
-	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
-	gPvd->connect(*transport,PxPvdInstrumentationFlag::eALL);
-
-	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(),true,gPvd);
-
-	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-
-	assert(init_sample_physics(gScene, gDispatcher) && "fatal error: failed to initialize sample physics");
-	// PxRigidStatic* ground_plane = gPhysics->createRigidStatic(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
-	// PxShape* ground_shape = gPhysics->createShape(PxBoxGeometry(100.0f, 1.0f, 100.0f), *gMaterial);
-	// ground_plane->attachShape(*ground_shape);
-	// gScene->addActor(*ground_plane);
-
-	// RenderItem *ground_render_item = new RenderItem(ground_shape, ground_plane, { 0.5f, 0.5f, 0.5f, 1.0f });
-	// g_world->ground_render_item = ground_render_item;
-
-	// PxRigidDynamic* cube0 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 100.0f, 0.0f)));
-	// PxShape* cube0_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
-	// cube0->attachShape(*cube0_shape);
-	// // // TODO: inertia tensors
-	// // cube0->setMassSpaceInertiaTensor({});
-	// PxRigidBodyExt::updateMassAndInertia(*cube0, 1.0f);
-	// gScene->addActor(*cube0);
-
-	// RenderItem *cube0_render_item = new RenderItem(cube0_shape, cube0, { 0.5f, 0.5f, 0.5f, 1.0f });
-	// g_world->cube0_render_item = cube0_render_item;
-
-	// PxRigidDynamic* cube1 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 150.0f, 0.0f)));
-	// PxShape* cube1_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
-	// cube1->attachShape(*cube1_shape);
-	// PxRigidBodyExt::updateMassAndInertia(*cube1, 4.0f);
-	// gScene->addActor(*cube1);
-
-	// RenderItem *cube1_render_item = new RenderItem(cube1_shape, cube1, { 0.5f, 0.5f, 0.5f, 1.0f });
-	// g_world->cube1_render_item = cube1_render_item;
-	
-
-	// axis:
-	using namespace types;
-	//gScene.
-	const f32 spacing = 10.0f;
-	origin_transform = PxTransform(v3_f32(0.0f, 0.0f, 0.0f));
-	positive_x_transform = PxTransform(v3_f32(spacing, 0.0f, 0.0f));
-	positive_y_transform = PxTransform(v3_f32(0.0f, spacing, 0.0f));
-	positive_z_transform = PxTransform(v3_f32(0.0f, 0.0f, spacing));
-
-	const Vector4 color_origin = { v3_f32(1.0f, 1.0f, 1.0f), 1.0 };
-	const Vector4 color_x = { v3_f32(1.0f, 0.0f, 0.0f), 1.0 };
-	const Vector4 color_y = { v3_f32(0.0f, 1.0f, 0.0f), 1.0 };
-	const Vector4 color_z = { v3_f32(0.0f, 0.0f, 1.0f), 1.0 };
-	const Vector4 color_particle = { v3_f32(1.0f, 1.0f, 0.0f), 1.0f };
-
-	const f32 size = 1.0f;
-	origin_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &origin_transform, color_origin);
-	positive_x_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_x_transform, color_x);
-	positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
-	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
-
+size_t spawn_sample_particles() {
 	constexpr objects::mass_f32 const min_mass = 0.1f;
 	constexpr objects::mass_f32 const max_mass = 10.0f;
 
@@ -416,17 +356,62 @@ void initPhysics(bool interactive)
 				}, 0.5f, 1.0f
 			);
 		}
-
-		auto ground = objects::solid_static_particle(
-			*gPhysics,
-			PxTransform(PxVec3(0.0f, -10.0f, 0.0f)),
-			*gMaterial,
-			PxBoxGeometry(100.0f, 1.0f, 100.0f),
-			PxVec4(0.5f, 0.5f, 0.5f, 1.0f)
-		);
-		gScene->addActor(*ground.rigid_static);
-		particle_system.add_particle<objects::solid_static_particle>(ground);
 	}
+
+	return particle_system.alive_particle_count();
+}
+
+// Initialize physics engine
+void initPhysics(bool interactive)
+{
+	PX_UNUSED(interactive);
+
+	gFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator, gErrorCallback);
+
+	gPvd = PxCreatePvd(*gFoundation);
+	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
+	gPvd->connect(*transport,PxPvdInstrumentationFlag::eALL);
+
+	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(),true,gPvd);
+
+	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	assert(init_sample_physics(gScene, gDispatcher) && "fatal error: failed to initialize sample physics");
+	
+	// axis:
+	using namespace types;
+	//gScene.
+	const f32 spacing = 10.0f;
+	origin_transform = PxTransform(v3_f32(0.0f, 0.0f, 0.0f));
+	positive_x_transform = PxTransform(v3_f32(spacing, 0.0f, 0.0f));
+	positive_y_transform = PxTransform(v3_f32(0.0f, spacing, 0.0f));
+	positive_z_transform = PxTransform(v3_f32(0.0f, 0.0f, spacing));
+
+	const Vector4 color_origin = { v3_f32(1.0f, 1.0f, 1.0f), 1.0 };
+	const Vector4 color_x = { v3_f32(1.0f, 0.0f, 0.0f), 1.0 };
+	const Vector4 color_y = { v3_f32(0.0f, 1.0f, 0.0f), 1.0 };
+	const Vector4 color_z = { v3_f32(0.0f, 0.0f, 1.0f), 1.0 };
+	const Vector4 color_particle = { v3_f32(1.0f, 1.0f, 0.0f), 1.0f };
+
+	const f32 size = 1.0f;
+	origin_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &origin_transform, color_origin);
+	positive_x_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_x_transform, color_x);
+	positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
+	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
+
+	//std::cout << spawn_sample_particles() << " particles spawned" << std::endl;
+	auto ground = objects::solid_static_particle(
+		*gPhysics,
+		PxTransform(PxVec3(0.0f, -10.0f, 0.0f)),
+		*gMaterial,
+		PxBoxGeometry(100.0f, 1.0f, 100.0f),
+		PxVec4(0.5f, 0.5f, 0.5f, 1.0f)
+	);
+	gScene->addActor(*ground.rigid_static);
+	particle_system.add_particle<objects::solid_static_particle>(ground);
+
+	g_world = new world{ pan(*gPhysics, PxTransform(PxVec3(10.0f, 5.0f, 10.0f))) };
+	gScene->addActor(*g_world->frying_pan.pan_solid.rigid_dynamic);
 }
 
 
@@ -470,20 +455,9 @@ void stepPhysics(bool interactive, double t)
 		[](systems::particle_id id,
 			objects::particle::deconstruct_position const &position, PxTransform *&particle_transform) {
 			particle_transform->p = physx::PxVec3(position.x, position.y, position.z);
-			// assert(
-			// 	!std::isnan(particle_transform->p.x)
-			// 	&& !std::isnan(particle_transform->p.y)
-			// 	&& !std::isnan(particle_transform->p.z)
-			// 	&& "error: particle position is NaN"
-			// );
-			// std::cout << "particle " << id << " position: "
-			// 	<< particle_transform->p.x << ", "
-			// 	<< particle_transform->p.y << ", "
-			// 	<< particle_transform->p.z << std::endl;
 		}
 	);
 
-	//std::cout << "cube0 y: " << g_world->cube0_render_item->transform->p.y << std::endl;
 	gScene->simulate(t);
 	PxU32 errorState = 0;
 	gScene->fetchResults(true, &errorState);
@@ -523,6 +497,8 @@ void cleanupPhysics(bool interactive)
 	for (size_t i = 0; i < particle_system.particles.particle_count(); ++i) {
 		particle_system.remove_particle(i);
 	}
+
+	delete g_world;
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
 	gScene->release();

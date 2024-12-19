@@ -62,6 +62,31 @@ namespace objects {
             return std::make_tuple(rigid_static, render_item);
         }
     };
+
+    struct solid_dynamic_multishape_particle {
+        physx::PxRigidDynamic *rigid_dynamic;
+        std::vector<RenderItem *> render_items;
+
+        solid_dynamic_multishape_particle(
+            physx::PxPhysics &physics,
+            physx::PxTransform const &transform,
+            physx::PxMaterial const &material,
+            std::vector<physx::PxGeometry const *> const &geometries,
+            std::vector<physx::PxTransform const *> const &local_poses,
+            std::vector<physx::PxVec4> const &colors,
+            std::vector<physx::PxVec3> const &mass_space_inertia_tensors
+        );
+
+        ~solid_dynamic_multishape_particle();
+
+        solid_dynamic_multishape_particle(solid_dynamic_multishape_particle const &) = delete;
+        solid_dynamic_multishape_particle &operator=(solid_dynamic_multishape_particle const &) = delete;
+
+        solid_dynamic_multishape_particle(solid_dynamic_multishape_particle &&other) noexcept;
+        solid_dynamic_multishape_particle &operator=(solid_dynamic_multishape_particle &&other) noexcept;
+    };
+
+    physx::PxVec3 box_mass_space_inertia_tensor(physx::PxBoxGeometry const &geometry, physx::PxReal mass);
 }
 
 #endif

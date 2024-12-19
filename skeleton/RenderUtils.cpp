@@ -107,13 +107,13 @@ void renderCallback()
 		if (!objTransform)
 		{
 			auto actor = obj->actor;
-			if (actor)
-			{
-				renderShape(*obj->shape, actor->getGlobalPose(), obj->color);
-				continue;
+			if (actor) {
+				renderShape(*obj->shape, actor->getGlobalPose().transform(obj->shape->getLocalPose()), obj->color);
+			} else {
+				renderShape(*obj->shape, obj->shape->getLocalPose(), obj->color);
 			}
 		} else {
-			renderShape(*obj->shape, objTransform ? *objTransform : physx::PxTransform(PxIdentity), obj->color);
+			renderShape(*obj->shape, *objTransform, obj->color);
 		}
 	}
 
