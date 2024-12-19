@@ -33,7 +33,7 @@ cookable cookable::create_egg(
             physx::PxVec4(1.0f, 1.0f, 1.0f, 1.0f),
             objects::box_mass_space_inertia_tensor(box, 1.0f)
         )
-        .build(physics, transform, *physics.createMaterial(0.5f, 0.5f, 0.6f))
+        .build(physics, transform, *physics.createMaterial(0.7f, 0.45f, 0.1f))
     );
 }
 
@@ -60,7 +60,7 @@ cookable cookable::create_steak(
             physx::PxVec4(0.5f, 0.25f, 0.0f, 1.0f) * 0.5f,
             objects::box_mass_space_inertia_tensor(box1, 2.0f)
         )
-        .build(physics, transform, *physics.createMaterial(0.5f, 0.5f, 0.6f))
+        .build(physics, transform, *physics.createMaterial(0.65f, 0.55f, 0.25f))
     );
 }
 
@@ -113,6 +113,6 @@ cookable cookable::create_fries(
             physx::PxVec4(1.0f, 1.0f, 0.0f, 1.0f),
             objects::box_mass_space_inertia_tensor(physx::PxBoxGeometry(scale_bounds.halfExtents.x * 0.25f, scale_bounds.halfExtents.y * 0.25f, scale_bounds.halfExtents.z * 0.25f), 0.5f)
         )
-        .build(physics, transform, *physics.createMaterial(0.5f, 0.5f, 0.6f))
+        .build(physics, transform, *physics.createMaterial(0.85f, 0.25f, 0.35f))
     );
 }

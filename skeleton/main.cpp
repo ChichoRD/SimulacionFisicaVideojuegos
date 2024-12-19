@@ -99,9 +99,9 @@ generators::dynamic_spring_force_generator dynamic_spring_force_generator =
 
 types::f32 buoyancy_gravity = 9.8f;
 generators::buoyancy_generator buoyancy_generator = generators::buoyancy_generator(
-	objects::position3_f32(0.0f, -15.0f, 0.0f),
+	objects::position3_f32(0.0f, 15.0f, 0.0f),
 	types::v3_f32(0.0f, 15.0f, 0.0f),
-	1000.0f,
+	100.0f,
 	1.0f
 );
 
@@ -115,16 +115,16 @@ struct combined_generator {
 	generators::dynamic_spring_force_generator dynamic_spring_force_generator;
 	generators::buoyancy_generator buoyancy_generator;
 
-	void apply_to_particles(systems::particle_system &particle_system, objects::seconds_f64 delta_time) {
-		gravity_generator.apply_to_particles(particle_system, delta_time);
-		wind_generator.apply_to_particles(particle_system, delta_time);
+	void apply_to_particles(systems::particle_system &sys, objects::seconds_f64 delta_time) {
+		gravity_generator.apply_to_particles(sys, delta_time);
+		wind_generator.apply_to_particles(sys, delta_time);
 		
 		//tornado_generator.apply_to_particles(particle_system, delta_time);
-		explosion_generator.apply_to_particles(particle_system, delta_time);
+		//explosion_generator.apply_to_particles(particle_system, delta_time);
 
 		// static_spring_force_generator.apply_to_particles(particle_system, delta_time);
 		// dynamic_spring_force_generator.apply_to_particles(particle_system, delta_time);
-		buoyancy_generator.apply_to_particles(particle_system, delta_time);
+		buoyancy_generator.apply_to_particles(sys, delta_time);
 	}
 };
 
@@ -248,99 +248,44 @@ static projectile_index instantiate_projectile(PxTransform const& camera, projec
 	return register_projectile(p, color, size) - 1;
 }
 
-// size_t spawn_sample_particles() {
-// 	constexpr objects::mass_f32 const min_mass = 0.1f;
-// 	constexpr objects::mass_f32 const max_mass = 10.0f;
+size_t spawn_sample_particles() {
+	constexpr objects::mass_f32 const min_mass = 0.1f;
+	constexpr objects::mass_f32 const max_mass = 10.0f;
 
-// 	{	
-// 		constexpr size_t const particle_count = 100;
-// 		for (size_t i = 0; i < particle_count; ++i) {
-// 			float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
-// 			objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
+	{	
+		constexpr size_t const particle_count = 100;
+		for (size_t i = 0; i < particle_count; ++i) {
+			float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
+			objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
 
-// 			types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
-// 			size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
-// 				[mass, &particle_position](objects::position3_f32 position, objects::velocity3_f32 velocity) {
-// 					particle_position = position;
-// 					return objects::mass_particle(objects::particle{position, {0.0f, 0.0f, 0.0f}}, mass);
-// 				}, 0.5f, 1.0f
-// 			);
+			types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
+			size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
+				[mass, &particle_position](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+					particle_position = position;
+					return objects::mass_particle(objects::particle{position, {0.0f, 0.0f, 0.0f}}, mass);
+				}, 0.5f, 1.0f
+			);
 
-// 			PxTransform *&particle_transform = std::get<PxTransform *&>(particle_system.set<PxTransform *>(
-// 				particle_id,
-// 				new PxTransform(particle_position)
-// 			));
+			PxTransform *&particle_transform = std::get<PxTransform *&>(particle_system.set<PxTransform *>(
+				particle_id,
+				new PxTransform(particle_position)
+			));
 
-// 			static_spring_force_generator.add_anchor<8>(particle_system, particle_id, objects::position3_f32{
-// 				0.0f, 100.0f, 1.0f
-// 			});
-// 		}
-// 	}
+			types::v3_f32 low_mass_colour = { 0.15f, 0.05f, 0.35f };
+			types::v3_f32 high_mass_colour = { 0.25f, 0.15f, 0.15f };
+			types::v3_f32 colour = types::v3_f32::lerp(low_mass_colour, high_mass_colour, normalized_mass);
+			RenderItem *particle_render_item = new RenderItem(CreateShape(PxSphereGeometry(0.25f)), particle_transform, {
+				colour.x,
+				colour.y,
+				colour.z,
+				1.0f
+			});
+			particle_system.set<RenderItem *>(particle_id, std::move(particle_render_item));
 
-// 	particle_system.iter_indexed<
-// 		objects::mass_particle::deconstruct_inverse_mass const,
-// 		PxTransform *
-// 	>(
-// 		[min_mass, max_mass](systems::particle_id id,
-// 			objects::mass_particle::deconstruct_inverse_mass const &inverse_mass,
-// 			PxTransform *&particle_transform) {
-// 			float mass = 1.0f / inverse_mass.value;
-// 			float normalized_mass = (mass - min_mass) / (max_mass - min_mass);
-
-// 			types::v3_f32 low_mass_colour = { 0.15f, 0.05f, 0.95f };
-// 			types::v3_f32 high_mass_colour = { 0.95f, 0.15f, 0.35f };
-// 			types::v3_f32 colour = types::v3_f32::lerp(low_mass_colour, high_mass_colour, normalized_mass);
-// 			RenderItem *particle_render_item = new RenderItem(CreateShape(PxSphereGeometry(1.0f)), particle_transform, {
-// 				colour.x,
-// 				colour.y,
-// 				colour.z,
-// 				1.0f
-// 			});
-// 			particle_system.set<RenderItem *>(id, std::move(particle_render_item));
-// 		}
-// 	);
-
-// 	{
-// 		constexpr size_t const solid_particle_count = 200;
-// 		for (size_t i = 0; i < solid_particle_count; ++i) {
-// 			float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
-// 			objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
-
-// 			types::v3_f32 low_mass_colour = { 0.15f, 0.05f, 0.95f };
-// 			types::v3_f32 high_mass_colour = { 0.95f, 0.15f, 0.35f };
-// 			types::v3_f32 colour = types::v3_f32::lerp(low_mass_colour, high_mass_colour, normalized_mass);
-
-// 			types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
-// 			size_t particle_id = particle_system.add_particle_random<objects::solid_dynamic_particle>(
-// 				[mass, colour](objects::position3_f32 position, objects::velocity3_f32 velocity) {
-
-// 					types::v3_f32 size = velocity.abs() * 0.5f;
-// 					types::f32 mass_factor = mass / 12.0f;
-// 					auto solid = objects::solid_dynamic_particle(
-// 						*gPhysics,
-// 						PxTransform(position),
-// 						*gMaterial,
-// 						PxBoxGeometry(size * 0.5f),
-// 						PxVec4(colour, 1.0f),
-// 						mass_factor * types::v3_f32{
-// 							size.y * size.y + size.z * size.z,
-// 							size.x * size.x + size.z * size.z,
-// 							size.x * size.x + size.y * size.y
-// 						}
-// 					);
-// 					gScene->addActor(*solid.rigid_dynamic);
-					
-// 					//disable gravity
-// 					solid.rigid_dynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-					
-// 					return solid;
-// 				}, 0.5f, 1.0f
-// 			);
-// 		}
-// 	}
-
-// 	return particle_system.alive_particle_count();
-// }
+		}
+	}
+	return particle_system.alive_particle_count();
+}
 
 game_scene *game;
 
@@ -362,27 +307,29 @@ void initPhysics(bool interactive)
 	game = new game_scene(*gPhysics);
 	game->init();
 	
-	{
-		// axis:
-		using namespace types;
-		const f32 spacing = 10.0f;
-		origin_transform = PxTransform(v3_f32(0.0f, 0.0f, 0.0f));
-		positive_x_transform = PxTransform(v3_f32(spacing, 0.0f, 0.0f));
-		positive_y_transform = PxTransform(v3_f32(0.0f, spacing, 0.0f));
-		positive_z_transform = PxTransform(v3_f32(0.0f, 0.0f, spacing));
+	// {
+	// 	// axis:
+	// 	using namespace types;
+	// 	const f32 spacing = 10.0f;
+	// 	origin_transform = PxTransform(v3_f32(0.0f, 0.0f, 0.0f));
+	// 	positive_x_transform = PxTransform(v3_f32(spacing, 0.0f, 0.0f));
+	// 	positive_y_transform = PxTransform(v3_f32(0.0f, spacing, 0.0f));
+	// 	positive_z_transform = PxTransform(v3_f32(0.0f, 0.0f, spacing));
 
-		const Vector4 color_origin = { v3_f32(1.0f, 1.0f, 1.0f), 1.0 };
-		const Vector4 color_x = { v3_f32(1.0f, 0.0f, 0.0f), 1.0 };
-		const Vector4 color_y = { v3_f32(0.0f, 1.0f, 0.0f), 1.0 };
-		const Vector4 color_z = { v3_f32(0.0f, 0.0f, 1.0f), 1.0 };
-		const Vector4 color_particle = { v3_f32(1.0f, 1.0f, 0.0f), 1.0f };
+	// 	const Vector4 color_origin = { v3_f32(1.0f, 1.0f, 1.0f), 1.0 };
+	// 	const Vector4 color_x = { v3_f32(1.0f, 0.0f, 0.0f), 1.0 };
+	// 	const Vector4 color_y = { v3_f32(0.0f, 1.0f, 0.0f), 1.0 };
+	// 	const Vector4 color_z = { v3_f32(0.0f, 0.0f, 1.0f), 1.0 };
+	// 	const Vector4 color_particle = { v3_f32(1.0f, 1.0f, 0.0f), 1.0f };
 
-		const f32 size = 1.0f;
-		origin_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &origin_transform, color_origin);
-		positive_x_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_x_transform, color_x);
-		positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
-		positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
-	}
+	// 	const f32 size = 1.0f;
+	// 	origin_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &origin_transform, color_origin);
+	// 	positive_x_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_x_transform, color_x);
+	// 	positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
+	// 	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
+	// }
+
+	spawn_sample_particles();
 }
 
 
@@ -393,6 +340,30 @@ void initPhysics(bool interactive)
 void stepPhysics(bool interactive, double t)
 {
 	PX_UNUSED(interactive);
+	auto force_composer = systems::force_composer<combined_generator>(combined_generator{
+		gravity_generator,
+		wind_generator,
+		tornado_generator,
+		explosion_generator,
+		static_spring_force_generator,
+		dynamic_spring_force_generator,
+		buoyancy_generator
+	});
+
+	auto sys = *game->pan_particle_system;
+	//update
+	force_composer.apply_to_particles(particle_system, t);
+	force_composer.compose_forces(particle_system, t);
+
+	particle_system.iter_indexed<
+		objects::particle::deconstruct_position const,
+		PxTransform *
+	>(
+		[](systems::particle_id id,
+			objects::particle::deconstruct_position const &position, PxTransform *&particle_transform) {
+			particle_transform->p = physx::PxVec3(position.x, position.y, position.z);
+		}
+	);
 	game->update(t);
 }
 
@@ -402,33 +373,15 @@ void cleanupPhysics(bool interactive)
 {
 	PX_UNUSED(interactive);
 
-	// axis:
-	DeregisterRenderItem(positive_z_render_item);
-	DeregisterRenderItem(positive_y_render_item);
-	DeregisterRenderItem(positive_x_render_item);
-	DeregisterRenderItem(origin_render_item);
-	delete positive_z_render_item;
-	delete positive_y_render_item;
-	delete positive_x_render_item;
-	delete origin_render_item;
-
-	// for (RenderItem *r : projectile_render_items) {
-	// 	DeregisterRenderItem(r);
-	// 	delete r;
-	// }
-	
-	// particle_system.iter<
-	// 	RenderItem *
-	// >(
-	// 	[](RenderItem *r) {
-	// 		DeregisterRenderItem(r);
-	// 		delete r;
-	// 	}
-	// );
-
-	// for (size_t i = 0; i < particle_system.particles.particle_count(); ++i) {
-	// 	particle_system.remove_particle(i);
-	// }
+	// // axis:
+	// DeregisterRenderItem(positive_z_render_item);
+	// DeregisterRenderItem(positive_y_render_item);
+	// DeregisterRenderItem(positive_x_render_item);
+	// DeregisterRenderItem(origin_render_item);
+	// delete positive_z_render_item;
+	// delete positive_y_render_item;
+	// delete positive_x_render_item;
+	// delete origin_render_item;
 
 	game->shutdown();
 	delete game;

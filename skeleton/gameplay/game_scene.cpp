@@ -21,7 +21,10 @@ static bool init_game_scene_physics(
 }
 
 game_scene::game_scene(physx::PxPhysics &physics)
-    : physics(physics), scene(nullptr), last_delta_time(0.0), next_pan_rotation(physx::PxQuat(0.0f, physx::PxVec3(0.0f, 0.0f, 1.0f))) {
+    : physics(physics),
+    scene(nullptr),
+    last_delta_time(0.0),
+    next_pan_rotation(physx::PxQuat(0.0f, physx::PxVec3(0.0f, 0.0f, 1.0f))) {
     assert(init_game_scene_physics(physics, scene, gDispatcher));
     scene->setSimulationEventCallback(this);
 }
@@ -42,6 +45,19 @@ bool game_scene::init() {
 
     frying_pan = pan(physics, physx::PxTransform(physx::PxVec3(0.0f, 5.0f, -2.5f)));
     scene->addActor(*frying_pan.pan_solid.rigid_dynamic);
+    pan_particle_system = new systems::particle_system(
+        systems::particle_generator(
+            systems::particle_generator::NORMAL,
+            systems::particle_generator::BOX,
+            systems::particle_generator::generation_volume(
+                systems::generation_box{ 
+                    frying_pan.pan_solid.rigid_dynamic->getGlobalPose().transform(frying_pan.base_shape->getLocalPose()).p,
+                    frying_pan.base_shape->getGeometry().box().halfExtents
+                }
+            )
+        ),
+        0.0f
+    );
 
     scene->addActor(*add_cookable(cookable::create_egg(
         physics,
@@ -49,7 +65,6 @@ bool game_scene::init() {
         physx::PxBoxGeometry(2.0f, 2.0f, 2.0f),
         10.0
     )).solid.rigid_dynamic);
-
     
     scene->addActor(*add_cookable(cookable::create_steak(
         physics,
@@ -71,6 +86,14 @@ bool game_scene::init() {
 bool game_scene::update(objects::seconds_f64 delta_time) {
     // TODO
     last_delta_time = delta_time;
+    for (auto it = cookables_to_remove.begin(); it != cookables_to_remove.end(); ++it) {
+        auto cookable_it = cookable_map.find(*it);
+        if (cookable_it != cookable_map.end()) {
+            cookables.erase(cookable_it->second);
+            cookable_map.erase(cookable_it);
+        }
+    }
+    cookables_to_remove.clear();
 
     auto &frying_pan_rb = frying_pan.pan_solid.rigid_dynamic;
 	frying_pan_rb->setKinematicTarget(physx::PxTransform(
@@ -86,7 +109,34 @@ bool game_scene::update(objects::seconds_f64 delta_time) {
 }
 
 bool game_scene::shutdown() {
-    // TODO particles
+    {
+        pan_particle_system->iter<RenderItem *>(
+            [](RenderItem *r) {
+                DeregisterRenderItem(r);
+                delete r;
+            }
+        );
+
+        for (size_t i = 0; i < pan_particle_system->particles.particle_count(); ++i) {
+            pan_particle_system->remove_particle(i);
+        }
+        delete pan_particle_system;
+    }
+
+    // {
+    //     cookables_particle_system->iter<RenderItem *>(
+    //         [](RenderItem *r) {
+    //             DeregisterRenderItem(r);
+    //             delete r;
+    //         }
+    //     );
+
+    //     for (size_t i = 0; i < cookables_particle_system->particles.particle_count(); ++i) {
+    //         cookables_particle_system->remove_particle(i);
+    //     }
+    //     delete cookables_particle_system;
+    // }
+
     return false;
 }
 
@@ -96,13 +146,55 @@ cookable &game_scene::add_cookable(cookable &&cookable) {
     return *it;
 }
 
-void game_scene::on_cookable_pan_contact(cookable &cookable, physx::PxContactPair const &pair)
-{
+void game_scene::on_cookable_pan_contact(cookable &cookable, physx::PxContactPair const &pair) {
     cookable.cook(last_delta_time);
 
     // std::cout << "Cooked: " << cookable.current_cook_time << std::endl;
     // std::cout << "Previous: " << cookable.previous_cook_time << std::endl;
     // std::cout << "%: " << cookable.current_cook_time / cookable.cook_time << std::endl << std::endl;
+}
+
+void game_scene::on_cookable_ground_contact(cookable &cookable) {
+    //std::cout << "Cooked: " << cookable.current_cook_time << std::endl;
+    
+    float cooking_ratio = cookable.current_cook_time / cookable.cook_time;
+    if (cooking_ratio > 1.75f) {
+        // TODO
+    } else if (cooking_ratio > 0.8f) {
+    } else if (cooking_ratio > 0.5f) {
+    } else {
+    }
+    cookables_to_remove.push_back(cookable.solid.rigid_dynamic);
+
+    size_t rnd = rand() % 3;
+    switch (rnd) {
+    case 0:
+        scene->addActor(*add_cookable(cookable::create_egg(
+            physics,
+            physx::PxTransform(physx::PxVec3(0.0f, 10.0f, 5.0f)),
+            physx::PxBoxGeometry(2.0f, 2.0f, 2.0f),
+            10.0
+        )).solid.rigid_dynamic);
+        break;
+    case 1:
+        scene->addActor(*add_cookable(cookable::create_steak(
+            physics,
+            physx::PxTransform(physx::PxVec3(0.0f, 15.0f, 5.0f)),
+            physx::PxBoxGeometry(2.0f, 1.0f, 2.0f),
+            10.0
+        )).solid.rigid_dynamic);
+        break;
+    case 2:
+        scene->addActor(*add_cookable(cookable::create_fries(
+            physics,
+            physx::PxTransform(physx::PxVec3(0.0f, 20.0f, 5.0f)),
+            physx::PxBoxGeometry(2.5f, 1.0f, 1.0f),
+            10.0
+        )).solid.rigid_dynamic);
+        break;
+    default:
+        break;
+    }
 }
 
 void game_scene::on_passive_mouse_motion(int x, int y) {
@@ -147,6 +239,15 @@ void game_scene::on_key_press(unsigned char key, const physx::PxTransform &camer
     switch (towlower(key)) {
     case ' ': {
         reset_pan_rotation_requested = true;
+        // FIXME!
+        // spawn_particle_burst(
+        //     *pan_particle_system,
+        //     2, 15,
+        //     0.5f, 1.0f,
+        //     0.01f, 0.1f,
+        //     {0.15f, 0.05f, 0.25f},
+        //     {0.15f, 0.15f, 0.35f}
+        // );
         break;
     }
     default:
@@ -162,6 +263,47 @@ void game_scene::on_key_release(unsigned char key) {
     }
     default:
         break;
+    }
+}
+
+void game_scene::spawn_particle_burst(
+    systems::particle_system &particle_system,
+    size_t count_min,
+    size_t count_max,
+    objects::seconds_f64 lifetime_min,
+    objects::seconds_f64 lifetime_max,
+    objects::mass_f32 min_mass,
+    objects::mass_f32 max_mass,
+    types::v3_f32 const &colour_min,
+    types::v3_f32 const &colour_max
+) {
+    size_t count = count_min + (rand() % (count_max - count_min));
+
+    for (size_t i = 0; i < count; ++i) {
+		float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
+		objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
+
+		types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
+		size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
+			[mass, &particle_position](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+				particle_position = position;
+				return objects::mass_particle(objects::particle{position, {0.0f, 0.0f, 0.0f}}, mass);
+			}, 0.5f, 1.0f
+		);
+
+		physx::PxTransform *&particle_transform = std::get<physx::PxTransform *&>(particle_system.set<physx::PxTransform *>(
+			particle_id,
+			new physx::PxTransform(particle_position)
+		));
+
+		types::v3_f32 colour = types::v3_f32::lerp(colour_min, colour_max, normalized_mass);
+		RenderItem *particle_render_item = new RenderItem(CreateShape(physx::PxSphereGeometry(0.25f)), particle_transform, {
+			colour.x,
+			colour.y,
+			colour.z,
+			1.0f
+		});
+		particle_system.set<RenderItem *>(particle_id, std::move(particle_render_item));
     }
 }
 
@@ -189,13 +331,20 @@ void game_scene::onContact(const physx::PxContactPairHeader &pairHeader, const p
     } else {
         auto cookable_it = actor0_it != cookable_map.end() ? actor0_it : actor1_it;
 
-        for (physx::PxU32 i = 0; i < nbPairs; ++i) {
-            const physx::PxContactPair &pair = pairs[i];
-            if (pair.shapes[0] == frying_pan.base_shape
-                || pair.shapes[1] == frying_pan.base_shape) {
-                on_cookable_pan_contact(*cookable_it->second, pair);
+        if (pairHeader.actors[0] == frying_pan.pan_solid.rigid_dynamic
+            || pairHeader.actors[1] == frying_pan.pan_solid.rigid_dynamic) {
+            for (physx::PxU32 i = 0; i < nbPairs; ++i) {
+                const physx::PxContactPair &pair = pairs[i];
+                if (pair.shapes[0] == frying_pan.base_shape
+                    || pair.shapes[1] == frying_pan.base_shape) {
+                    on_cookable_pan_contact(*cookable_it->second, pair);
+                }
             }
+        } else if (pairHeader.actors[0] == ground.rigid_static
+            || pairHeader.actors[1] == ground.rigid_static) {
+            on_cookable_ground_contact(*cookable_it->second);
         }
+
     }
 }
 

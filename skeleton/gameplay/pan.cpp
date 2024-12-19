@@ -50,7 +50,7 @@ objects::solid_dynamic_multishape_particle pan::create_pan(
 
     auto base_box = physx::PxBoxGeometry(pan::pan_base_size);
     types::v3_f32 base_color = handle_color * 0.5f;
-    types::f32 base_mass = 10.0f;
+    types::f32 base_mass = 5.0f;
     builder.add_shape(
         base_box,
         physx::PxTransform(local_attachment_point),
@@ -83,7 +83,7 @@ objects::solid_dynamic_multishape_particle pan::create_pan(
         );
     }
 
-    physx::PxMaterial *material = physics.createMaterial(0.5f, 0.5f, 0.6f);
+    physx::PxMaterial *material = physics.createMaterial(0.85f, 0.65f, 0.25f);
     auto pan = builder.build(physics, transform, *material);
     pan.rigid_dynamic->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
     pan.rigid_dynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
