@@ -3,10 +3,12 @@
 
 #include <tuple>
 #include <type_traits>
+#include <cmath>
 
 #include "particle_system.hpp"
 #include "../objects/particle.hpp"
 #include "../objects/mass_particle.hpp"
+#include "../objects/solid_particle.hpp"
 
 namespace systems {
     template <typename Generator>
@@ -52,6 +54,20 @@ namespace systems {
                     position = particle.particle.position;
                     velocity = particle.particle.velocity;
                     inverse_mass.value = particle.inverse_mass;
+                }
+            );
+
+            // PHYSX
+            particle_system.iter<
+                objects::generators::particle_force const,
+                objects::solid_dynamic_particle::deconstruct_rigid_dynamic
+            >(
+                [delta_time_seconds](objects::generators::particle_force const &force,
+                    objects::solid_dynamic_particle::deconstruct_rigid_dynamic &rigid_dynamic) {
+                    if (std::isnan(force.x) || std::isnan(force.y) || std::isnan(force.z)) {
+                        return;
+                    }
+                    rigid_dynamic->addForce(force);
                 }
             );
         }

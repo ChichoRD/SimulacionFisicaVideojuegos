@@ -246,12 +246,6 @@ static projectile_index instantiate_projectile(PxTransform const& camera, projec
 	return register_projectile(p, color, size) - 1;
 }
 
-struct world {
-	RenderItem *ground_render_item;
-	RenderItem *cube0_render_item;
-	RenderItem *cube1_render_item;
-} *g_world = nullptr;
-
 bool init_sample_physics(PxScene *&out_scene, PxDefaultCpuDispatcher *&out_dispatcher) {
 	assert(gPhysics && "error: physics must be initialized before calling init_sample_physics");
 	
@@ -282,35 +276,34 @@ void initPhysics(bool interactive)
 
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-	g_world = new world();
 	assert(init_sample_physics(gScene, gDispatcher) && "fatal error: failed to initialize sample physics");
-	PxRigidStatic* ground_plane = gPhysics->createRigidStatic(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
-	PxShape* ground_shape = gPhysics->createShape(PxBoxGeometry(100.0f, 1.0f, 100.0f), *gMaterial);
-	ground_plane->attachShape(*ground_shape);
-	gScene->addActor(*ground_plane);
+	// PxRigidStatic* ground_plane = gPhysics->createRigidStatic(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+	// PxShape* ground_shape = gPhysics->createShape(PxBoxGeometry(100.0f, 1.0f, 100.0f), *gMaterial);
+	// ground_plane->attachShape(*ground_shape);
+	// gScene->addActor(*ground_plane);
 
-	RenderItem *ground_render_item = new RenderItem(ground_shape, ground_plane, { 0.5f, 0.5f, 0.5f, 1.0f });
-	g_world->ground_render_item = ground_render_item;
+	// RenderItem *ground_render_item = new RenderItem(ground_shape, ground_plane, { 0.5f, 0.5f, 0.5f, 1.0f });
+	// g_world->ground_render_item = ground_render_item;
 
-	PxRigidDynamic* cube0 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 100.0f, 0.0f)));
-	PxShape* cube0_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
-	cube0->attachShape(*cube0_shape);
-	// // TODO: inertia tensors
-	// cube0->setMassSpaceInertiaTensor({});
-	PxRigidBodyExt::updateMassAndInertia(*cube0, 1.0f);
-	gScene->addActor(*cube0);
+	// PxRigidDynamic* cube0 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 100.0f, 0.0f)));
+	// PxShape* cube0_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
+	// cube0->attachShape(*cube0_shape);
+	// // // TODO: inertia tensors
+	// // cube0->setMassSpaceInertiaTensor({});
+	// PxRigidBodyExt::updateMassAndInertia(*cube0, 1.0f);
+	// gScene->addActor(*cube0);
 
-	RenderItem *cube0_render_item = new RenderItem(cube0_shape, cube0, { 0.5f, 0.5f, 0.5f, 1.0f });
-	g_world->cube0_render_item = cube0_render_item;
+	// RenderItem *cube0_render_item = new RenderItem(cube0_shape, cube0, { 0.5f, 0.5f, 0.5f, 1.0f });
+	// g_world->cube0_render_item = cube0_render_item;
 
-	PxRigidDynamic* cube1 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 150.0f, 0.0f)));
-	PxShape* cube1_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
-	cube1->attachShape(*cube1_shape);
-	PxRigidBodyExt::updateMassAndInertia(*cube1, 4.0f);
-	gScene->addActor(*cube1);
+	// PxRigidDynamic* cube1 = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 150.0f, 0.0f)));
+	// PxShape* cube1_shape = gPhysics->createShape(PxBoxGeometry(1.0f, 1.0f, 1.0f), *gMaterial);
+	// cube1->attachShape(*cube1_shape);
+	// PxRigidBodyExt::updateMassAndInertia(*cube1, 4.0f);
+	// gScene->addActor(*cube1);
 
-	RenderItem *cube1_render_item = new RenderItem(cube1_shape, cube1, { 0.5f, 0.5f, 0.5f, 1.0f });
-	g_world->cube1_render_item = cube1_render_item;
+	// RenderItem *cube1_render_item = new RenderItem(cube1_shape, cube1, { 0.5f, 0.5f, 0.5f, 1.0f });
+	// g_world->cube1_render_item = cube1_render_item;
 	
 
 	// axis:
@@ -334,32 +327,32 @@ void initPhysics(bool interactive)
 	positive_y_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_y_transform, color_y);
 	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
 
-	constexpr size_t const particle_count = 100;
 	constexpr objects::mass_f32 const min_mass = 0.1f;
 	constexpr objects::mass_f32 const max_mass = 10.0f;
-	std::vector<systems::particle_id> particle_ids{};
 
-	for (size_t i = 0; i < particle_count; ++i) {
-		float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
-		objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
+	{	
+		constexpr size_t const particle_count = 100;
+		for (size_t i = 0; i < particle_count; ++i) {
+			float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
+			objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
 
-		types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
-		size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
-			[mass, &particle_position](objects::position3_f32 position, objects::velocity3_f32 velocity) {
-				particle_position = position;
-				return objects::mass_particle(objects::particle{position, {0.0f, 0.0f, 0.0f}}, mass);
-			}, 0.5f, 1.0f
-		);
+			types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
+			size_t particle_id = particle_system.add_particle_random<objects::mass_particle>(
+				[mass, &particle_position](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+					particle_position = position;
+					return objects::mass_particle(objects::particle{position, {0.0f, 0.0f, 0.0f}}, mass);
+				}, 0.5f, 1.0f
+			);
 
-		PxTransform *&particle_transform = std::get<PxTransform *&>(particle_system.set<PxTransform *>(
-			particle_id,
-			new PxTransform(particle_position)
-		));
+			PxTransform *&particle_transform = std::get<PxTransform *&>(particle_system.set<PxTransform *>(
+				particle_id,
+				new PxTransform(particle_position)
+			));
 
-		static_spring_force_generator.add_anchor<8>(particle_system, particle_id, objects::position3_f32{
-			0.0f, 100.0f, 1.0f
-		});
-		particle_ids.push_back(particle_id);
+			static_spring_force_generator.add_anchor<8>(particle_system, particle_id, objects::position3_f32{
+				0.0f, 100.0f, 1.0f
+			});
+		}
 	}
 
 	particle_system.iter_indexed<
@@ -384,6 +377,47 @@ void initPhysics(bool interactive)
 			particle_system.set<RenderItem *>(id, std::move(particle_render_item));
 		}
 	);
+
+	{
+		constexpr size_t const solid_particle_count = 200;
+		for (size_t i = 0; i < solid_particle_count; ++i) {
+			float normalized_mass = std::uniform_real_distribution<float>(0.0f, 1.0f)(particle_system.generator.generator);
+			objects::mass_f32 mass = min_mass + normalized_mass * (max_mass - min_mass);
+
+			types::v3_f32 low_mass_colour = { 0.15f, 0.05f, 0.95f };
+			types::v3_f32 high_mass_colour = { 0.95f, 0.15f, 0.35f };
+			types::v3_f32 colour = types::v3_f32::lerp(low_mass_colour, high_mass_colour, normalized_mass);
+
+			types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
+			size_t particle_id = particle_system.add_particle_random<objects::solid_dynamic_particle>(
+				[mass, colour](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+					auto solid = objects::solid_dynamic_particle(
+						*gPhysics,
+						PxTransform(position),
+						*gMaterial,
+						PxBoxGeometry(1.0f, 1.0f, 1.0f),
+						PxVec4(colour, 1.0f)
+					);
+					gScene->addActor(*solid.rigid_dynamic);
+					
+					//disable gravity
+					solid.rigid_dynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+					
+					return solid;
+				}, 0.5f, 1.0f
+			);
+		}
+
+		auto ground = objects::solid_static_particle(
+			*gPhysics,
+			PxTransform(PxVec3(0.0f, -10.0f, 0.0f)),
+			*gMaterial,
+			PxBoxGeometry(100.0f, 1.0f, 100.0f),
+			PxVec4(0.5f, 0.5f, 0.5f, 1.0f)
+		);
+		gScene->addActor(*ground.rigid_static);
+		particle_system.add_particle<objects::solid_static_particle>(ground);
+	}
 }
 
 
@@ -480,15 +514,6 @@ void cleanupPhysics(bool interactive)
 	for (size_t i = 0; i < particle_system.particles.particle_count(); ++i) {
 		particle_system.remove_particle(i);
 	}
-
-	DeregisterRenderItem(g_world->ground_render_item);
-	delete g_world->ground_render_item;
-	DeregisterRenderItem(g_world->cube0_render_item);
-	delete g_world->cube0_render_item;
-	DeregisterRenderItem(g_world->cube1_render_item);
-	delete g_world->cube1_render_item;
-
-	delete g_world;
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
 	gScene->release();
