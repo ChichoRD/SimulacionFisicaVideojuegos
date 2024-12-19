@@ -1,5 +1,6 @@
 #include "solid_particle.hpp"
 #include <cassert>
+#include <cmath>
 
 static physx::PxShape *init_rigid_dynamic(
     physx::PxPhysics &physics,
@@ -116,5 +117,47 @@ physx::PxVec3 objects::box_mass_space_inertia_tensor(physx::PxBoxGeometry const 
         geometry.halfExtents.y * geometry.halfExtents.y + geometry.halfExtents.z * geometry.halfExtents.z,
         geometry.halfExtents.x * geometry.halfExtents.x + geometry.halfExtents.z * geometry.halfExtents.z,
         geometry.halfExtents.x * geometry.halfExtents.x + geometry.halfExtents.y * geometry.halfExtents.y
+    );
+}
+
+physx::PxVec3 objects::hollow_sphere_mass_space_inertia_tensor(physx::PxSphereGeometry const &geometry, physx::PxReal mass) {
+    return physx::PxVec3(2.0f * mass * geometry.radius * geometry.radius / 3.0f);
+}
+
+physx::PxVec3 objects::solid_sphere_mass_space_inertia_tensor(physx::PxSphereGeometry const &geometry, physx::PxReal mass) {
+    return physx::PxVec3(2.0f * mass * geometry.radius * geometry.radius / 5.0f);
+}
+
+physx::PxVec3 objects::shell_sphere_mass_space_inertia_tensor(
+    physx::PxSphereGeometry const &inner_geometry,
+    physx::PxSphereGeometry const &outter_geometry,
+    physx::PxReal mass
+) {
+    return physx::PxVec3(
+        (2.0f * mass * (std::pow(outter_geometry.radius, 5.0f) - std::pow(inner_geometry.radius, 5.0f)))
+        / (5.0f * (std::pow(outter_geometry.radius, 3.0f) - std::pow(inner_geometry.radius, 3.0f)))
+    );
+}
+
+physx::PxVec3 objects::solid_cylinder_mass_space_inertia_tensor(physx::PxCapsuleGeometry const &geometry, physx::PxReal mass) {
+    float symmetric_part = mass * (geometry.radius * geometry.radius * 3.0f + geometry.halfHeight * geometry.halfHeight * 4.0f) / 12.0f;
+    return physx::PxVec3(
+        symmetric_part,
+        mass * geometry.radius * geometry.radius * 0.5f,
+        symmetric_part
+    );
+}
+
+physx::PxVec3 objects::hollow_tube_mass_space_inertia_tensor(
+    physx::PxCapsuleGeometry const &inner_geometry,
+    physx::PxCapsuleGeometry const &outter_geometry,
+    physx::PxReal mass
+) {
+    float sqr_radii_sum = outter_geometry.radius * outter_geometry.radius + inner_geometry.radius * inner_geometry.radius;
+    float symmetric_part = mass * (sqr_radii_sum * 3.0f + inner_geometry.halfHeight * outter_geometry.halfHeight * 4.0f) / 12.0f;
+    return physx::PxVec3(
+        symmetric_part,
+        mass * sqr_radii_sum * 0.5f,
+        symmetric_part
     );
 }

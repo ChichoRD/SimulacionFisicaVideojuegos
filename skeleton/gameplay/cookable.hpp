@@ -1,8 +1,23 @@
 #ifndef COOKABLE_HPP
 #define COOKABLE_HPP
 
+#include <PxPhysicsAPI.h>
+#include "../objects/solid_particle.hpp"
+#include "../objects/mass_particle.hpp"
+#include "../types/v3_f32.hpp"
+
 struct cookable {
-    // TODO
+    objects::seconds_f64 cook_time;
+    objects::solid_dynamic_multishape_particle solid;
+
+    cookable() = default;
+    cookable(objects::seconds_f64 cook_time, objects::solid_dynamic_multishape_particle &&solid);
+
+    static cookable create_egg(
+        physx::PxPhysics &physics,
+        physx::PxTransform const &transform,
+        objects::seconds_f64 cook_time
+    );
 };
 
 #endif

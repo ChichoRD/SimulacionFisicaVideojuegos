@@ -90,6 +90,21 @@ namespace objects {
     };
 
     physx::PxVec3 box_mass_space_inertia_tensor(physx::PxBoxGeometry const &geometry, physx::PxReal mass);
+
+    physx::PxVec3 hollow_sphere_mass_space_inertia_tensor(physx::PxSphereGeometry const &geometry, physx::PxReal mass);
+    physx::PxVec3 solid_sphere_mass_space_inertia_tensor(physx::PxSphereGeometry const &geometry, physx::PxReal mass);
+    physx::PxVec3 shell_sphere_mass_space_inertia_tensor(
+        physx::PxSphereGeometry const &inner_geometry,
+        physx::PxSphereGeometry const &outter_geometry,
+        physx::PxReal mass
+    );
+
+    physx::PxVec3 solid_cylinder_mass_space_inertia_tensor(physx::PxCapsuleGeometry const &geometry, physx::PxReal mass);
+    physx::PxVec3 hollow_tube_mass_space_inertia_tensor(
+        physx::PxCapsuleGeometry const &inner_geometry,
+        physx::PxCapsuleGeometry const &outter_geometry,
+        physx::PxReal mass
+    );
 }
 
 #endif
