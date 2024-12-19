@@ -7,7 +7,7 @@
 
 struct pan {
 private:
-    constexpr static types::f32 pan_length_unit = 0.5f;
+    constexpr static types::f32 pan_length_unit = 1.0f;
 
     constexpr static size_t pan_handle_pieces_count = 2;
     constexpr static size_t pan_handle_straight_pieces_count = 1;
@@ -25,11 +25,17 @@ private:
     constexpr static types::v3_f32 pan_base_size = {pan_length_unit * 8.0f, pan_length_unit, pan_length_unit * 8.0f};
     constexpr static types::v3_f32 pan_base_wall_size = {pan_length_unit, pan_length_unit, pan_base_size.z};
 
-    static objects::solid_dynamic_multishape_particle create_pan(physx::PxPhysics &physics, physx::PxTransform const &transform);
+    static objects::solid_dynamic_multishape_particle create_pan(
+        physx::PxPhysics &physics,
+        physx::PxTransform const &transform,
+        physx::PxShape *&out_base_shape
+    );
 
 public:
     objects::solid_dynamic_multishape_particle pan_solid;
+    physx::PxShape *base_shape;
 
+    pan() = default;
     pan(physx::PxPhysics &physics, physx::PxTransform const &transform);
 };
 

@@ -14,6 +14,7 @@ namespace objects {
         physx::PxRigidDynamic *rigid_dynamic;
         RenderItem *render_item;
 
+        solid_dynamic_particle() = default;
         solid_dynamic_particle(
             physx::PxPhysics &physics,
             physx::PxTransform const &transform,
@@ -42,6 +43,7 @@ namespace objects {
         physx::PxRigidStatic *rigid_static;
         RenderItem *render_item;
 
+        solid_static_particle() = default;
         solid_static_particle(
             physx::PxPhysics &physics,
             physx::PxTransform const &transform,
@@ -67,6 +69,7 @@ namespace objects {
         physx::PxRigidDynamic *rigid_dynamic;
         std::vector<RenderItem *> render_items;
 
+        solid_dynamic_multishape_particle();
         solid_dynamic_multishape_particle(
             physx::PxPhysics &physics,
             physx::PxTransform const &transform,

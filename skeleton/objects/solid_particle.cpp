@@ -51,6 +51,9 @@ objects::solid_static_particle::solid_static_particle(
     )) {
 }
 
+objects::solid_dynamic_multishape_particle::solid_dynamic_multishape_particle()
+    : rigid_dynamic(nullptr), render_items{} { }
+
 objects::solid_dynamic_multishape_particle::solid_dynamic_multishape_particle(
     physx::PxPhysics &physics,
     physx::PxTransform const &transform,
@@ -58,9 +61,9 @@ objects::solid_dynamic_multishape_particle::solid_dynamic_multishape_particle(
     std::vector<physx::PxGeometry const *> const &geometries,
     std::vector<physx::PxTransform const *> const &local_poses,
     std::vector<physx::PxVec4> const &colors,
-    std::vector<physx::PxVec3> const &mass_space_inertia_tensors
-) : rigid_dynamic(physics.createRigidDynamic(transform)),
-    render_items{} {
+    std::vector<physx::PxVec3> const &mass_space_inertia_tensors) : rigid_dynamic(physics.createRigidDynamic(transform)),
+                                                                    render_items{}
+{
     assert(
         geometries.size() == local_poses.size()
         && local_poses.size() == colors.size()
