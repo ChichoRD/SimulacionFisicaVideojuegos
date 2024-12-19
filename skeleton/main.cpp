@@ -79,13 +79,13 @@ generators::tornado_generator tornado_generator = generators::tornado_generator(
 	types::v3_f32(0.0f, -5.0f, 0.0f),
 	types::v3_f32(0.0f, 1.0f, 0.0f),
 	100.0f,
-	250.0f,
-	1500.0f	
+	50.0f,
+	10.0f	
 );
 
 generators::explosion_generator explosion_generator = generators::explosion_generator(
 	types::v3_f32(0.0f, 0.0f, 0.0f),
-	15000.0f,
+	1500.0f,
 	50.0f,
 	4.0f
 );
@@ -117,7 +117,8 @@ struct combined_generator {
 	void apply_to_particles(systems::particle_system &particle_system, objects::seconds_f64 delta_time) {
 		gravity_generator.apply_to_particles(particle_system, delta_time);
 		wind_generator.apply_to_particles(particle_system, delta_time);
-		tornado_generator.apply_to_particles(particle_system, delta_time);
+		
+		//tornado_generator.apply_to_particles(particle_system, delta_time);
 		explosion_generator.apply_to_particles(particle_system, delta_time);
 
 		// static_spring_force_generator.apply_to_particles(particle_system, delta_time);
@@ -391,12 +392,20 @@ void initPhysics(bool interactive)
 			types::v3_f32 particle_position = {0.0f, 0.0f, 0.0f};
 			size_t particle_id = particle_system.add_particle_random<objects::solid_dynamic_particle>(
 				[mass, colour](objects::position3_f32 position, objects::velocity3_f32 velocity) {
+
+					types::v3_f32 size = velocity.abs() * 0.5f;
+					types::f32 mass_factor = mass / 12.0f;
 					auto solid = objects::solid_dynamic_particle(
 						*gPhysics,
 						PxTransform(position),
 						*gMaterial,
-						PxBoxGeometry(1.0f, 1.0f, 1.0f),
-						PxVec4(colour, 1.0f)
+						PxBoxGeometry(size * 0.5f),
+						PxVec4(colour, 1.0f),
+						mass_factor * types::v3_f32{
+							size.y * size.y + size.z * size.z,
+							size.x * size.x + size.z * size.z,
+							size.x * size.x + size.y * size.y
+						}
 					);
 					gScene->addActor(*solid.rigid_dynamic);
 					

@@ -4,13 +4,12 @@ static physx::PxShape *init_rigid_dynamic(
     physx::PxPhysics &physics,
     physx::PxRigidDynamic *rigid_dynamic,
     physx::PxMaterial const &material,
-    physx::PxGeometry const &geometry
+    physx::PxGeometry const &geometry,
+    physx::PxVec3 const &mass_space_inertia_tensor
 ) {
     physx::PxShape *shape = rigid_dynamic->createShape(geometry, material);
     rigid_dynamic->attachShape(*shape);
-
-    // TODO: mass and inertia
-    physx::PxRigidBodyExt::updateMassAndInertia(*rigid_dynamic, 1.0f);
+    rigid_dynamic->setMassSpaceInertiaTensor(mass_space_inertia_tensor);
     return shape;
 }
 
@@ -19,10 +18,11 @@ objects::solid_dynamic_particle::solid_dynamic_particle(
     physx::PxTransform const &transform,
     physx::PxMaterial const &material,
     physx::PxGeometry const &geometry,
-    physx::PxVec4 const &color
+    physx::PxVec4 const &color,
+    physx::PxVec3 const &mass_space_inertia_tensor
 ) : rigid_dynamic(physics.createRigidDynamic(transform)),
     render_item(new RenderItem(
-        init_rigid_dynamic(physics, rigid_dynamic, material, geometry), rigid_dynamic, color
+        init_rigid_dynamic(physics, rigid_dynamic, material, geometry, mass_space_inertia_tensor), rigid_dynamic, color
     )) {
 }
 

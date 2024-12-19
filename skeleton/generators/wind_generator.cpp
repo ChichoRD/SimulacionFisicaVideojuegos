@@ -45,15 +45,15 @@ void generators::wind_generator::apply_to_particles(
 
     particle_system.iter<
         objects::solid_dynamic_particle::deconstruct_rigid_dynamic const,
-        objects::generators::particle_force
+        objects::generators::particle_torque
     >(
         [this, delta_time](objects::solid_dynamic_particle::deconstruct_rigid_dynamic const &rigid_dynamic,
-            objects::generators::particle_force &force) {
+            objects::generators::particle_torque &torque) {
             types::v3_f32 velocity = types::v3_f32{rigid_dynamic->getLinearVelocity()};
             if (!wind_force_applies(rigid_dynamic->getGlobalPose().p, this->area_centre, this->area_radius))
                 return;
 
-            force += wind_force(this->wind_velocity, velocity, this->k1, this->k2);
+            torque += wind_force(this->wind_velocity, velocity, this->k1, this->k2);
         }
     );
 }

@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <cstdlib>
 #include <PxPhysicsAPI.h>
 
 namespace types {
@@ -55,6 +56,9 @@ namespace types {
 			return *this / this->magnitude();
 		}
 
+		constexpr v3 abs() const {
+			return { std::abs(x), std::abs(y), std::abs(z) };
+		}
 
 	public:
 		constexpr v3() noexcept

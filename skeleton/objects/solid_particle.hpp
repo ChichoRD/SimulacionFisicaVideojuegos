@@ -19,7 +19,8 @@ namespace objects {
             physx::PxTransform const &transform,
             physx::PxMaterial const &material,
             physx::PxGeometry const &geometry,
-            physx::PxVec4 const &color
+            physx::PxVec4 const &color,
+            physx::PxVec3 const &mass_space_inertia_tensor
         );
 
         solid_dynamic_particle(deconstruct_rigid_dynamic rigid_dynamic, deconstruct_render_item render_item)

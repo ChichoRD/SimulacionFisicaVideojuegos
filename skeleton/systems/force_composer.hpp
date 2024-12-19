@@ -25,6 +25,15 @@ namespace systems {
                     i,
                     objects::generators::particle_force{0.0f, 0.0f, 0.0f}
                 );
+                
+                if (particle_system.particles.particle_has_attribute<
+                        objects::solid_dynamic_particle::deconstruct_rigid_dynamic
+                    >(i)) {
+                    particle_system.set(
+                        i,
+                        objects::generators::particle_torque{0.0f, 0.0f, 0.0f}
+                    );
+                }
             }
             generator.apply_to_particles(particle_system, delta_time_seconds);
         }
@@ -60,14 +69,19 @@ namespace systems {
             // PHYSX
             particle_system.iter<
                 objects::generators::particle_force const,
+                objects::generators::particle_torque const,
                 objects::solid_dynamic_particle::deconstruct_rigid_dynamic
             >(
                 [delta_time_seconds](objects::generators::particle_force const &force,
+                    objects::generators::particle_torque const &torque,
                     objects::solid_dynamic_particle::deconstruct_rigid_dynamic &rigid_dynamic) {
-                    if (std::isnan(force.x) || std::isnan(force.y) || std::isnan(force.z)) {
-                        return;
+                    if (!std::isnan(force.x) && !std::isnan(force.y) && !std::isnan(force.z)) {
+                        rigid_dynamic->addForce(force);
                     }
-                    rigid_dynamic->addForce(force);
+
+                    if (!std::isnan(torque.x) && !std::isnan(torque.y) && !std::isnan(torque.z)) {
+                        rigid_dynamic->addTorque(torque);
+                    }
                 }
             );
         }

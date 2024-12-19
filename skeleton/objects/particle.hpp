@@ -80,6 +80,7 @@ namespace objects {
 
 	namespace generators {
 		using particle_force = v3<f32, struct force>;
+		using particle_torque = v3<f32, struct torque>;
 	}
 }
 
