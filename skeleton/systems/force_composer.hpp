@@ -13,9 +13,9 @@
 namespace systems {
     template <typename Generator>
     struct force_composer {
-        Generator generator;
+        Generator &generator;
 
-        force_composer(Generator&& generator) : generator(generator) {
+        force_composer(Generator &generator) : generator(generator) {
 
         }
 

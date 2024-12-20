@@ -99,10 +99,10 @@ generators::dynamic_spring_force_generator dynamic_spring_force_generator =
 
 types::f32 buoyancy_gravity = 9.8f;
 generators::buoyancy_generator buoyancy_generator = generators::buoyancy_generator(
-	objects::position3_f32(0.0f, 15.0f, 0.0f),
-	types::v3_f32(0.0f, 15.0f, 0.0f),
-	100.0f,
-	1.0f
+	objects::position3_f32(0.0f, 0.0f, 0.0f),
+	types::v3_f32(0.0f, 60.0f, 0.0f),
+	1000.0f,
+	0.350f
 );
 
 struct combined_generator {
@@ -329,7 +329,7 @@ void initPhysics(bool interactive)
 	// 	positive_z_render_item = new RenderItem(CreateShape(PxSphereGeometry(size)), &positive_z_transform, color_z);
 	// }
 
-	spawn_sample_particles();
+	//spawn_sample_particles();
 }
 
 
@@ -340,30 +340,6 @@ void initPhysics(bool interactive)
 void stepPhysics(bool interactive, double t)
 {
 	PX_UNUSED(interactive);
-	auto force_composer = systems::force_composer<combined_generator>(combined_generator{
-		gravity_generator,
-		wind_generator,
-		tornado_generator,
-		explosion_generator,
-		static_spring_force_generator,
-		dynamic_spring_force_generator,
-		buoyancy_generator
-	});
-
-	auto sys = *game->pan_particle_system;
-	//update
-	force_composer.apply_to_particles(particle_system, t);
-	force_composer.compose_forces(particle_system, t);
-
-	particle_system.iter_indexed<
-		objects::particle::deconstruct_position const,
-		PxTransform *
-	>(
-		[](systems::particle_id id,
-			objects::particle::deconstruct_position const &position, PxTransform *&particle_transform) {
-			particle_transform->p = physx::PxVec3(position.x, position.y, position.z);
-		}
-	);
 	game->update(t);
 }
 
